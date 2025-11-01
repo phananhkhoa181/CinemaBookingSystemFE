@@ -27,7 +27,7 @@
             android:id="@+id/tvWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chào mừng trở lại!"
+            android:text="Chào mừng đến với Movie88!"
             android:textSize="@dimen/text_xxl"
             android:textColor="@color/textPrimary"
             android:textStyle="bold"
