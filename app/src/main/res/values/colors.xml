@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- Primary Theme Colors - Netflix Red -->
+    <color name="colorPrimary">#E50914</color>
+    <color name="colorPrimaryDark">#B20710</color>
+    <color name="colorPrimaryLight">#FF2E38</color>
+    <color name="colorAccent">#FFB800</color>
+    
+    <!-- Background Colors -->
+    <color name="backgroundColor">#141414</color>
+    <color name="backgroundCard">#1F1F1F</color>
+    <color name="backgroundDialog">#2B2B2B</color>
+    <color name="backgroundInput">#2F2F2F</color>
+    <color name="backgroundSecondary">#1E1E1E</color>
+    <color name="cardBackground">#2C2C2C</color>
+    
+    <!-- Text Colors -->
+    <color name="textPrimary">#FFFFFF</color>
+    <color name="textSecondary">#B3B3B3</color>
+    <color name="textHint">#808080</color>
+    <color name="textDisabled">#606060</color>
+    <color name="textTertiary">#666666</color>
+    
+    <!-- Seat Colors -->
+    <color name="seatAvailable">#4A4A4A</color>
+    <color name="seatSelected">#E50914</color>
+    <color name="seatOccupied">#2F2F2F</color>
+    <color name="seatVIP">#FFB800</color>
+    <color name="seatCouple">#FF6B9D</color>
+    <color name="seatBooked">#757575</color>
+    
+    <!-- Status Colors -->
+    <color name="statusSuccess">#4CAF50</color>
+    <color name="statusError">#F44336</color>
+    <color name="statusWarning">#FF9800</color>
+    <color name="statusInfo">#2196F3</color>
+    <color name="statusPending">#FF9800</color>
+    <color name="statusConfirmed">#4CAF50</color>
+    <color name="statusCompleted">#2196F3</color>
+    <color name="statusCancelled">#F44336</color>
+    
+    <!-- Button Colors -->
+    <color name="buttonPrimary">#E50914</color>
+    <color name="buttonSecondary">#4A4A4A</color>
+    <color name="buttonDisabled">#2F2F2F</color>
+    <color name="buttonTextPrimary">#FFFFFF</color>
+    <color name="buttonTextSecondary">#B3B3B3</color>
+    
+    <!-- Divider & Border Colors -->
+    <color name="divider">#333333</color>
+    <color name="border">#4A4A4A</color>
+    <color name="borderFocused">#E50914</color>
+    
+    <!-- Additional UI Colors -->
+    <color name="overlay">#80000000</color>
+    <color name="error">#F44336</color>
+    <color name="success">#4CAF50</color>
+</resources>

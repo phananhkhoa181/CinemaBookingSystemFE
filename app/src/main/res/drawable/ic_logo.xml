@@ -1,0 +1,41 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Background Circle -->
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M100,100m-80,0a80,80 0,1 1,160 0a80,80 0,1 1,-160 0"/>
+    
+    <!-- Film Strip -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,70 L140,70 L140,130 L60,130 Z"/>
+    
+    <!-- Film Holes -->
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M70,80 m-5,0 a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M70,100 m-5,0 a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M70,120 m-5,0 a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M130,80 m-5,0 a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M130,100 m-5,0 a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M130,120 m-5,0 a5,5 0,1 1,10 0a5,5 0,1 1,-10 0"/>
+    
+    <!-- Play Button -->
+    <path
+        android:fillColor="#E50914"
+        android:pathData="M90,85 L115,100 L90,115 Z"/>
+</vector>

@@ -1,0 +1,66 @@
+<resources>
+    <string name="app_name">Movie88</string>
+    
+    <!-- Authentication -->
+    <string name="welcome_back">Chào mừng trở lại!</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="dont_have_account">Chưa có tài khoản? Đăng ký ngay</string>
+    <string name="already_have_account">Đã có tài khoản? Đăng nhập</string>
+    
+    <!-- Navigation -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_bookings">Đặt vé</string>
+    <string name="nav_profile">Tài khoản</string>
+    
+    <!-- Home -->
+    <string name="now_showing">Phim đang chiếu</string>
+    <string name="coming_soon">Phim sắp chiếu</string>
+    <string name="see_all">Xem tất cả</string>
+    <string name="search_movies">Tìm phim...</string>
+    
+    <!-- Booking -->
+    <string name="select_cinema">Chọn rạp &amp; suất chiếu</string>
+    <string name="select_seats">Chọn ghế</string>
+    <string name="select_combo">Chọn combo</string>
+    <string name="booking_summary">Xác nhận đặt vé</string>
+    <string name="payment_result">Kết quả thanh toán</string>
+    
+    <!-- Seat Types -->
+    <string name="seat_available">Còn trống</string>
+    <string name="seat_selected">Đang chọn</string>
+    <string name="seat_booked">Đã đặt</string>
+    <string name="seat_vip">VIP</string>
+    
+    <!-- Booking Status -->
+    <string name="status_pending">Chờ xử lý</string>
+    <string name="status_confirmed">Đã xác nhận</string>
+    <string name="status_completed">Hoàn thành</string>
+    <string name="status_cancelled">Đã hủy</string>
+    
+    <!-- Common -->
+    <string name="confirm">Xác nhận</string>
+    <string name="cancel">Hủy</string>
+    <string name="save">Lưu</string>
+    <string name="delete">Xóa</string>
+    <string name="edit">Chỉnh sửa</string>
+    <string name="back">Quay lại</string>
+    <string name="next">Tiếp theo</string>
+    <string name="skip">Bỏ qua</string>
+    <string name="loading">Đang tải...</string>
+    <string name="error">Lỗi</string>
+    <string name="success">Thành công</string>
+    <string name="total_price">Tổng tiền</string>
+    <string name="apply">Áp dụng</string>
+    
+    <!-- Error Messages -->
+    <string name="error_email_invalid">Email không hợp lệ</string>
+    <string name="error_password_short">Mật khẩu phải có ít nhất 6 ký tự</string>
+    <string name="error_network">Lỗi kết nối mạng</string>
+    <string name="error_login_failed">Đăng nhập thất bại</string>
+    
+    <!-- TODO: Thêm các string khác khi implement -->
+</resources>
