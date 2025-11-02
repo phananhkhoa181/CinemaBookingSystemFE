@@ -6,6 +6,7 @@
     
     <!-- Primary Theme Colors - Netflix Red -->
     <color name="colorPrimary">#E50914</color>
+    <color name="primaryColor">#E50914</color>
     <color name="colorPrimaryDark">#B20710</color>
     <color name="colorPrimaryLight">#FF2E38</color>
     <color name="colorAccent">#FFB800</color>
@@ -59,4 +60,8 @@
     <color name="overlay">#80000000</color>
     <color name="error">#F44336</color>
     <color name="success">#4CAF50</color>
+    
+    <!-- Rating Color -->
+    <color name="ratingYellow">#FFD700</color>
+    <color name="ratingColor">#FFD700</color>
 </resources>
