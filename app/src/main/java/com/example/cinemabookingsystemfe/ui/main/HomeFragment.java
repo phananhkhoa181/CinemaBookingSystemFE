@@ -62,7 +62,7 @@ public class HomeFragment extends Fragment {
         
         return view;
     }
-    
+
     private void initViews(View view) {
         vpBanner = view.findViewById(R.id.vpBanner);
         tabIndicator = view.findViewById(R.id.tabIndicator);
@@ -72,12 +72,12 @@ public class HomeFragment extends Fragment {
         btnNotification = view.findViewById(R.id.btnNotification);
         rvMovies = view.findViewById(R.id.rvMovies);
         progressBar = view.findViewById(R.id.progressBar);
-        
+
         // Set white text color for SearchView
         androidx.appcompat.widget.SearchView searchBar = view.findViewById(R.id.searchBar);
         if (searchBar != null) {
-            androidx.appcompat.widget.SearchView.SearchAutoComplete searchText = 
-                searchBar.findViewById(androidx.appcompat.R.id.search_src_text);
+            android.widget.AutoCompleteTextView searchText =
+                    searchBar.findViewById(androidx.appcompat.R.id.search_src_text);
             if (searchText != null) {
                 searchText.setTextColor(android.graphics.Color.WHITE);
                 searchText.setHintTextColor(0x80FFFFFF); // Semi-transparent white

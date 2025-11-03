@@ -25,9 +25,9 @@
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
-        <!-- Main Activity - Temporarily as launcher for testing -->
+        <!-- Login Activity - First screen -->
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.auth.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.CinemaBookingSystemFE">
             <intent-filter>
@@ -36,12 +36,13 @@
             </intent-filter>
         </activity>
         
-        <!-- Authentication Activities -->
+        <!-- Main Activity - After login -->
         <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
+        <!-- Authentication Activities -->
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false"
