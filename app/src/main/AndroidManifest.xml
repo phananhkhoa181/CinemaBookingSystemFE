@@ -53,7 +53,20 @@
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
         <!-- TODO: Other activities will be added when modules are implemented -->
-        
+
+        <activity android:name=".ui.moviedetail.SearchMovieActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+
+        <activity android:name=".ui.moviedetail.MovieDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+
+        <activity android:name=".ui.moviedetail.MovieTrailerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+
+
 
         
         <!-- TODO: Thêm các Activities khác khi implement -->

@@ -1,12 +1,15 @@
 package com.example.cinemabookingsystemfe.ui.main;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +25,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.ui.adapters.BannerAdapter;
 import com.example.cinemabookingsystemfe.ui.adapters.MovieAdapter;
+import com.example.cinemabookingsystemfe.ui.moviedetail.SearchMovieActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -32,12 +36,16 @@ public class HomeFragment extends Fragment {
     private TabLayout tabMovies;
     private ImageButton btnPrevBanner, btnNextBanner;
     private ImageButton btnNotification;
+
+    private ImageView btnSearch;
     private RecyclerView rvMovies;
     private ProgressBar progressBar;
     
     private HomeViewModel viewModel;
     private BannerAdapter bannerAdapter;
     private MovieAdapter movieAdapter;
+
+    private EditText etSearch;
     
     private Handler bannerHandler;
     private Runnable bannerRunnable;
@@ -72,22 +80,10 @@ public class HomeFragment extends Fragment {
         btnNotification = view.findViewById(R.id.btnNotification);
         rvMovies = view.findViewById(R.id.rvMovies);
         progressBar = view.findViewById(R.id.progressBar);
-        
-        // Set white text color for SearchView
-        androidx.appcompat.widget.SearchView searchBar = view.findViewById(R.id.searchBar);
-        if (searchBar != null) {
-            androidx.appcompat.widget.SearchView.SearchAutoComplete searchText = 
-                searchBar.findViewById(androidx.appcompat.R.id.search_src_text);
-            if (searchText != null) {
-                searchText.setTextColor(android.graphics.Color.WHITE);
-                searchText.setHintTextColor(0x80FFFFFF); // Semi-transparent white
-                
-                // Set white cursor
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    searchText.setTextCursorDrawable(R.drawable.cursor_white);
-                }
-            }
-        }
+
+        // Search button
+        btnSearch = view.findViewById(R.id.btnSearch);
+        etSearch = view.findViewById(R.id.etSearch);
     }
     
     private void initViewModel() {
@@ -186,6 +182,18 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
+        // Search Button
+        btnSearch.setOnClickListener(v -> {
+            String movieTitle = etSearch.getText().toString().trim(); // Lấy text người dùng nhập
+            if (!movieTitle.isEmpty()) {
+                Intent intent = new Intent(getContext(), SearchMovieActivity.class);
+                intent.putExtra("movieTitle", movieTitle); // Truyền dữ liệu
+                startActivity(intent);
+            } else {
+                Toast.makeText(getContext(), "Vui lòng nhập tên phim", Toast.LENGTH_SHORT).show();
+            }
         });
     }
     

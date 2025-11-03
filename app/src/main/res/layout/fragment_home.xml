@@ -49,20 +49,53 @@
         </androidx.appcompat.widget.Toolbar>
 
         <!-- Search Bar -->
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchBar"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/bg_search"
-            android:textColor="@android:color/white"
-            android:textColorHint="#80FFFFFF"
-            app:iconifiedByDefault="false"
-            app:queryHint="Tìm kiếm phim..."
-            app:searchHintIcon="@null"
-            app:searchIcon="@drawable/ic_search"
-            app:queryBackground="@android:color/transparent"/>
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/spacing_sm"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/backgroundCard">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="@dimen/spacing_sm">
+
+                <ImageView
+                    android:id="@+id/btnSearch"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/textSecondary"/>
+
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/spacing_sm"
+                    android:background="@null"
+                    android:hint="Movie Name"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textHint"
+                    android:textSize="16sp"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"/>
+
+                <ImageView
+                    android:id="@+id/btnClear"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_close"
+                    android:visibility="gone"
+                    app:tint="@color/textSecondary"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </com.google.android.material.appbar.AppBarLayout>
 

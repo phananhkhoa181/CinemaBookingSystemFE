@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
+    <style name="Chip" parent="Widget.MaterialComponents.Chip.Entry">
+        <item name="chipBackgroundColor">@color/backgroundCard</item>
+        <item name="chipCornerRadius">24dp</item>
+        <item name="chipStrokeWidth">0dp</item>
+        <item name="chipIconTint">@color/textSecondary</item>
+        <item name="android:textColor">@color/textPrimary</item>
+    </style>
+
+
     <!-- Text Styles -->
     <style name="Text" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/textPrimary</item>
