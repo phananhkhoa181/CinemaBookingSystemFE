@@ -40,6 +40,21 @@
             android:gravity="center"
             android:layout_marginBottom="32dp"/>
         
+        <!-- TODO: TEMPORARY - Remove this button when real HomeFragment is implemented -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTestBooking"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đặt vé (Test)"
+            android:textColor="@android:color/white"
+            android:backgroundTint="@color/colorAccent"
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="12dp"
+            android:layout_marginBottom="16dp"
+            app:cornerRadius="8dp"
+            app:icon="@drawable/ic_ticket"
+            app:iconGravity="textStart"/>
+        
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogout"
             android:layout_width="wrap_content"

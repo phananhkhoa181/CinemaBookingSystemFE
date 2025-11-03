@@ -52,6 +52,28 @@
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
+        <!-- Booking Flow Activities -->
+        <activity
+            android:name=".ui.booking.SelectCinemaActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
+        <activity
+            android:name=".ui.booking.SelectSeatActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
+        <activity
+            android:name=".ui.booking.SelectComboActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
+        <!-- Payment Activities -->
+        <activity
+            android:name=".ui.payment.BookingSummaryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
         <!-- TODO: Other activities will be added when modules are implemented -->
         
 

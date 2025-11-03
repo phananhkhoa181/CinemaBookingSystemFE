@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.ui.auth.LoginActivity;
+import com.example.cinemabookingsystemfe.ui.booking.SelectCinemaActivity;
 import com.example.cinemabookingsystemfe.utils.SharedPrefsManager;
 import com.google.android.material.button.MaterialButton;
 
@@ -23,6 +24,8 @@ import com.google.android.material.button.MaterialButton;
  */
 public class MainActivity extends AppCompatActivity {
     
+    // TODO: TEMPORARY - Remove btnTestBooking when real HomeFragment is implemented
+    private MaterialButton btnTestBooking;
     private MaterialButton btnLogout;
     private SharedPrefsManager prefsManager;
     
@@ -32,9 +35,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         
         prefsManager = SharedPrefsManager.getInstance(this);
-        btnLogout = findViewById(R.id.btnLogout);
         
+        // TODO: TEMPORARY - Remove this section when real HomeFragment is implemented
+        btnTestBooking = findViewById(R.id.btnTestBooking);
+        btnTestBooking.setOnClickListener(v -> testBookingFlow());
+        
+        btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> logout());
+    }
+    
+    // TODO: TEMPORARY - Remove this method when real HomeFragment is implemented
+    private void testBookingFlow() {
+        Intent intent = new Intent(this, SelectCinemaActivity.class);
+        intent.putExtra(SelectCinemaActivity.EXTRA_MOVIE_ID, 1); // Mock movie ID for testing
+        startActivity(intent);
     }
     
     private void logout() {
