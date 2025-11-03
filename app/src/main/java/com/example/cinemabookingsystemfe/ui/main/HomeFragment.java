@@ -70,7 +70,7 @@ public class HomeFragment extends Fragment {
         
         return view;
     }
-    
+
     private void initViews(View view) {
         vpBanner = view.findViewById(R.id.vpBanner);
         tabIndicator = view.findViewById(R.id.tabIndicator);
