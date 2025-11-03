@@ -64,4 +64,5 @@
     <!-- Rating Color -->
     <color name="ratingYellow">#FFD700</color>
     <color name="ratingColor">#FFD700</color>
+    <color name="secondaryText">#F44336</color>
 </resources>

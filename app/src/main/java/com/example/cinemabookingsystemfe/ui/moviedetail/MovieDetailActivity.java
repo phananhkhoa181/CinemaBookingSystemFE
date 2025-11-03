@@ -10,15 +10,21 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.data.api.ApiCallback;
 import com.example.cinemabookingsystemfe.data.api.MockApiService;
+import com.example.cinemabookingsystemfe.data.models.response.ApiResponse;
 import com.example.cinemabookingsystemfe.data.models.response.MovieDetailResponse;
+import com.example.cinemabookingsystemfe.data.models.response.showtimes.ShowtimesDate;
+import com.example.cinemabookingsystemfe.ui.moviedetail.adapter.ShowtimeAdapter;
 import com.google.android.material.button.MaterialButton;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 public class MovieDetailActivity extends AppCompatActivity {
@@ -28,9 +34,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView tvTitle, tvOverview, tvGenre, tvRating, tvDuration, tvAgeRating;
     private TextView tvDirector;
     private MaterialButton btnBookNow, btnWatchTrailer;
+    private RecyclerView rvShowtimes;
 
-    // ✅ Thêm biến này để lưu movie đang hiển thị
     private MovieDetailResponse currentMovie;
+    private ShowtimeAdapter showtimeAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,10 +46,9 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        if (getSupportActionBar() != null) {
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        toolbar.setNavigationOnClickListener(v -> finish());
 
         // Mapping UI
         progressBar = findViewById(R.id.progressBar);
@@ -55,42 +61,30 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvDuration = findViewById(R.id.tvDuration);
         tvAgeRating = findViewById(R.id.tvAgeRating);
         tvDirector = findViewById(R.id.tvDirector);
-
         btnBookNow = findViewById(R.id.btnBookNow);
         btnWatchTrailer = findViewById(R.id.btnWatchTrailer);
+        rvShowtimes = findViewById(R.id.rvShowtimes);
+
+        rvShowtimes.setLayoutManager(new LinearLayoutManager(this));
 
         int movieId = getIntent().getIntExtra("movieId", 1);
         loadMovieDetail(movieId);
+        loadShowtimes(movieId);
 
         btnBookNow.setOnClickListener(v -> doBooking());
-        // ✅ Xử lý nút "Watch Trailer"
         btnWatchTrailer.setOnClickListener(v -> doWatchTrailer());
-
-        toolbar.setNavigationOnClickListener(v -> goBack());
-
     }
 
     private void loadMovieDetail(int movieId) {
         progressBar.setVisibility(View.VISIBLE);
-
         MockApiService.getMovieDetail(movieId, new ApiCallback<MovieDetailResponse>() {
             @Override
             public void onSuccess(MovieDetailResponse movie) {
                 progressBar.setVisibility(View.GONE);
-
-                // ✅ Gán movie hiện tại
                 currentMovie = movie;
 
-                // Load backdrop and poster
-                Glide.with(MovieDetailActivity.this)
-                        .load(movie.getBackdropUrl())
-                        .into(ivBackdrop);
-
-                Glide.with(MovieDetailActivity.this)
-                        .load(movie.getPosterUrl())
-                        .into(ivPoster);
-
-                // Set movie info
+                Glide.with(MovieDetailActivity.this).load(movie.getBackdropUrl()).into(ivBackdrop);
+                Glide.with(MovieDetailActivity.this).load(movie.getPosterUrl()).into(ivPoster);
                 tvTitle.setText(movie.getTitle());
                 tvOverview.setText(movie.getOverview());
                 tvGenre.setText(movie.getGenre());
@@ -100,7 +94,6 @@ public class MovieDetailActivity extends AppCompatActivity {
                 String year = new SimpleDateFormat("yyyy", Locale.getDefault())
                         .format(movie.getReleaseDate());
                 tvDuration.setText(movie.getDuration() + " min • " + year);
-
                 tvAgeRating.setText(movie.getAgeRating());
             }
 
@@ -109,6 +102,31 @@ public class MovieDetailActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(MovieDetailActivity.this,
                         "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadShowtimes(int movieId) {
+        progressBar.setVisibility(View.VISIBLE);
+        MockApiService.getMovieShowtimes(movieId, new ApiCallback<ApiResponse<List<ShowtimesDate>>>() {
+            @Override
+            public void onSuccess(ApiResponse<List<ShowtimesDate>> response) {
+                progressBar.setVisibility(View.GONE);
+                List<ShowtimesDate> showtimes = response.getData();
+                showtimeAdapter = new ShowtimeAdapter(showtimes, showtime ->
+                        Toast.makeText(MovieDetailActivity.this,
+                                "Chọn suất " + showtime.getStartTime() +
+                                        " (" + showtime.getLanguageType() + ")",
+                                Toast.LENGTH_SHORT).show());
+                rvShowtimes.setAdapter(showtimeAdapter);
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(MovieDetailActivity.this,
+                        "Error loading showtimes: " + errorMessage,
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -125,9 +143,5 @@ public class MovieDetailActivity extends AppCompatActivity {
         } else {
             Toast.makeText(MovieDetailActivity.this, "Trailer not available.", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void goBack() {
-        finish();
     }
 }
