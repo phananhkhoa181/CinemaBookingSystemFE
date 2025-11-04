@@ -7,9 +7,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,9 +21,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.cinemabookingsystemfe.R;
-import com.example.cinemabookingsystemfe.ui.adapters.BannerAdapter;
+import com.example.cinemabookingsystemfe.data.model.Movie;
+import com.example.cinemabookingsystemfe.ui.adapters.PromotionAdapter;
 import com.example.cinemabookingsystemfe.ui.adapters.MovieAdapter;
-import com.example.cinemabookingsystemfe.ui.moviedetail.SearchMovieActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -36,16 +34,12 @@ public class HomeFragment extends Fragment {
     private TabLayout tabMovies;
     private ImageButton btnPrevBanner, btnNextBanner;
     private ImageButton btnNotification;
-
-    private ImageView btnSearch;
     private RecyclerView rvMovies;
     private ProgressBar progressBar;
     
     private HomeViewModel viewModel;
-    private BannerAdapter bannerAdapter;
+    private PromotionAdapter promotionAdapter;
     private MovieAdapter movieAdapter;
-
-    private EditText etSearch;
     
     private Handler bannerHandler;
     private Runnable bannerRunnable;
@@ -80,10 +74,57 @@ public class HomeFragment extends Fragment {
         btnNotification = view.findViewById(R.id.btnNotification);
         rvMovies = view.findViewById(R.id.rvMovies);
         progressBar = view.findViewById(R.id.progressBar);
-
-        // Search button
-        btnSearch = view.findViewById(R.id.btnSearch);
-        etSearch = view.findViewById(R.id.etSearch);
+        
+        // Setup SearchView
+        try {
+            int searchBarId = getResources().getIdentifier("searchBar", "id", requireContext().getPackageName());
+            if (searchBarId != 0) {
+                View searchBarView = view.findViewById(searchBarId);
+                if (searchBarView instanceof androidx.appcompat.widget.SearchView) {
+                    androidx.appcompat.widget.SearchView searchBar = (androidx.appcompat.widget.SearchView) searchBarView;
+                    
+                    // Get the SearchView AutoCompleteTextView and set colors
+                    android.widget.AutoCompleteTextView searchText = 
+                        searchBar.findViewById(androidx.appcompat.R.id.search_src_text);
+                    if (searchText != null) {
+                        // Use same colors as search movie activity
+                        int textPrimary = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.textPrimary);
+                        int textHint = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.textHint);
+                        
+                        searchText.setTextColor(textPrimary);
+                        searchText.setHintTextColor(textHint);
+                        
+                        // Set cursor color (API 29+)
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                            searchText.setTextCursorDrawable(R.drawable.cursor_white);
+                        }
+                    }
+                    
+                    // When SearchView gets focus, immediately open SearchMovieActivity
+                    searchBar.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
+                        if (hasFocus) {
+                            searchBar.clearFocus(); // Clear focus to prevent keyboard
+                            Intent intent = new Intent(getContext(), com.example.cinemabookingsystemfe.ui.moviedetail.SearchMovieActivity.class);
+                            startActivity(intent);
+                        }
+                    });
+                    
+                    // Also handle direct clicks
+                    searchBar.setOnClickListener(v -> {
+                        Intent intent = new Intent(getContext(), com.example.cinemabookingsystemfe.ui.moviedetail.SearchMovieActivity.class);
+                        startActivity(intent);
+                    });
+                    
+                    // Handle search icon click
+                    searchBar.setOnSearchClickListener(v -> {
+                        Intent intent = new Intent(getContext(), com.example.cinemabookingsystemfe.ui.moviedetail.SearchMovieActivity.class);
+                        startActivity(intent);
+                    });
+                }
+            }
+        } catch (Exception e) {
+            // SearchView not available yet, will be added later
+        }
     }
     
     private void initViewModel() {
@@ -91,10 +132,11 @@ public class HomeFragment extends Fragment {
     }
     
     private void setupBanner() {
-        bannerAdapter = new BannerAdapter(banner -> {
-            // Banner click
+        promotionAdapter = new PromotionAdapter(promotion -> {
+            // Promotion click
+            Toast.makeText(getContext(), promotion.getName(), Toast.LENGTH_SHORT).show();
         });
-        vpBanner.setAdapter(bannerAdapter);
+        vpBanner.setAdapter(promotionAdapter);
         
         new TabLayoutMediator(tabIndicator, vpBanner, (tab, position) -> {
             // Empty implementation for dots
@@ -106,7 +148,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void run() {
                 int currentItem = vpBanner.getCurrentItem();
-                int itemCount = bannerAdapter.getItemCount();
+                int itemCount = promotionAdapter.getItemCount();
                 if (itemCount > 0) {
                     int nextItem = (currentItem + 1) % itemCount;
                     vpBanner.setCurrentItem(nextItem, true);
@@ -137,8 +179,8 @@ public class HomeFragment extends Fragment {
     private void setupMoviesRecyclerView() {
         // Single adapter that switches between Now Showing and Coming Soon
         movieAdapter = new MovieAdapter(movie -> {
-            // Movie click
-            Toast.makeText(getContext(), "Movie: " + movie.getTitle(), Toast.LENGTH_SHORT).show();
+            // Navigate to Movie Detail
+            navigateToMovieDetail(movie);
         });
         
         LinearLayoutManager layoutManager = new LinearLayoutManager(
@@ -158,7 +200,7 @@ public class HomeFragment extends Fragment {
         
         btnNextBanner.setOnClickListener(v -> {
             int currentItem = vpBanner.getCurrentItem();
-            int itemCount = bannerAdapter.getItemCount();
+            int itemCount = promotionAdapter.getItemCount();
             if (currentItem < itemCount - 1) {
                 vpBanner.setCurrentItem(currentItem + 1, true);
             }
@@ -183,18 +225,6 @@ public class HomeFragment extends Fragment {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
-
-        // Search Button
-        btnSearch.setOnClickListener(v -> {
-            String movieTitle = etSearch.getText().toString().trim(); // Lấy text người dùng nhập
-            if (!movieTitle.isEmpty()) {
-                Intent intent = new Intent(getContext(), SearchMovieActivity.class);
-                intent.putExtra("movieTitle", movieTitle); // Truyền dữ liệu
-                startActivity(intent);
-            } else {
-                Toast.makeText(getContext(), "Vui lòng nhập tên phim", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
     
     private void observeViewModel() {
@@ -202,9 +232,9 @@ public class HomeFragment extends Fragment {
             progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         });
         
-        viewModel.getBanners().observe(getViewLifecycleOwner(), banners -> {
-            if (banners != null && !banners.isEmpty()) {
-                bannerAdapter.setBanners(banners);
+        viewModel.getPromotions().observe(getViewLifecycleOwner(), promotions -> {
+            if (promotions != null && !promotions.isEmpty()) {
+                promotionAdapter.setPromotions(promotions);
             }
         });
         
@@ -238,6 +268,14 @@ public class HomeFragment extends Fragment {
                 movieAdapter.setMovies(viewModel.getComingSoonMovies().getValue());
             }
         }
+    }
+    
+    private void navigateToMovieDetail(Movie movie) {
+        // TODO: Create MovieDetailActivity and navigate
+        // For now, show toast with movie info
+        Toast.makeText(getContext(), 
+            "Movie: " + movie.getTitle() + "\nRating: " + movie.getRating() + "\n⭐ " + movie.getAverageRating(), 
+            Toast.LENGTH_SHORT).show();
     }
     
     @Override

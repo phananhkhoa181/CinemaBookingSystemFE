@@ -41,6 +41,22 @@
                 android:alpha="0.3"
                 app:tint="@color/textSecondary"/>
 
+            <!-- Age Rating Badge - Bottom Right -->
+            <TextView
+                android:id="@+id/tvAgeRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_age_rating"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="T16"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="T16"/>
+
         </FrameLayout>
 
         <!-- Movie Info -->

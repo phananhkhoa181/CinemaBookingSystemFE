@@ -42,12 +42,15 @@ public class MovieRepository {
     private List<Movie> generateMockMovies(String status) {
         List<Movie> movies = new ArrayList<>();
         
+        String[] ageRatings = {"P", "T13", "T16", "T18", "C"};
+        
         for (int i = 1; i <= 5; i++) {
             Movie movie = new Movie();
             movie.setMovieId(i);
             movie.setTitle("Phim " + status + " " + i);
             movie.setPosterUrl("https://via.placeholder.com/300x450");
-            movie.setRating(7.5 + (i * 0.3));
+            movie.setRating(ageRatings[i % ageRatings.length]); // Age rating (String)
+            movie.setAverageRating(7.5 + (i * 0.3)); // Average rating score (double)
             movie.setStatus(status);
             movie.setGenres(Arrays.asList("Hành động", "Phiêu lưu"));
             movies.add(movie);

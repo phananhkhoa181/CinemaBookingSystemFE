@@ -55,7 +55,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     
     class MovieViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPoster, ivPlaceholder;
-        TextView tvTitle, tvGenre, tvRating, tvDuration;
+        TextView tvTitle, tvGenre, tvRating, tvDuration, tvAgeRating;
         
         MovieViewHolder(View itemView) {
             super(itemView);
@@ -65,6 +65,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
             tvGenre = itemView.findViewById(R.id.tvGenre);
             tvRating = itemView.findViewById(R.id.tvRating);
             tvDuration = itemView.findViewById(R.id.tvDuration);
+            tvAgeRating = itemView.findViewById(R.id.tvAgeRating);
             
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -77,8 +78,16 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         void bind(Movie movie) {
             tvTitle.setText(movie.getTitle());
             tvGenre.setText(movie.getGenresString());
-            tvRating.setText(String.format("%.1f", movie.getRating()));
+            tvRating.setText(String.format("%.1f", movie.getAverageRating()));
             tvDuration.setText(movie.getDuration() + "'");
+            
+            // Age rating badge (rating field from backend)
+            if (movie.getRating() != null && !movie.getRating().isEmpty()) {
+                tvAgeRating.setText(movie.getRating());
+                tvAgeRating.setVisibility(View.VISIBLE);
+            } else {
+                tvAgeRating.setVisibility(View.GONE);
+            }
             
             // Show placeholder by default
             ivPlaceholder.setVisibility(View.VISIBLE);

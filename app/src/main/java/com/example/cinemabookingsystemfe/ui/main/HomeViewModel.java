@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.cinemabookingsystemfe.data.model.Movie;
-import com.example.cinemabookingsystemfe.data.model.Banner;
+import com.example.cinemabookingsystemfe.data.model.Promotion;
 import com.example.cinemabookingsystemfe.data.repository.MovieRepository;
 import com.example.cinemabookingsystemfe.network.ApiCallback;
 import com.example.cinemabookingsystemfe.data.model.PagedResult;
@@ -18,32 +18,45 @@ public class HomeViewModel extends ViewModel {
     private final MovieRepository movieRepository;
     
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
-    private final MutableLiveData<List<Banner>> banners = new MutableLiveData<>();
+    private final MutableLiveData<List<Promotion>> promotions = new MutableLiveData<>();
     private final MutableLiveData<List<Movie>> nowShowingMovies = new MutableLiveData<>();
     private final MutableLiveData<List<Movie>> comingSoonMovies = new MutableLiveData<>();
     private final MutableLiveData<String> error = new MutableLiveData<>();
     
     public HomeViewModel() {
         movieRepository = MovieRepository.getInstance();
-        loadBanners();
+        loadPromotions();
     }
     
-    private void loadBanners() {
-        // Mock banner data with real movie backdrops
-        List<Banner> mockBanners = new ArrayList<>();
-        mockBanners.add(new Banner(1, "Avatar: The Way of Water", 
-            "https://image.tmdb.org/t/p/original/s16H6tpK2utvwDtzZ8Qy4qm5Emw.jpg", 
-            "https://example.com/1", "External", 0, true));
-        mockBanners.add(new Banner(2, "Black Panther: Wakanda Forever", 
-            "https://image.tmdb.org/t/p/original/yYrvN5WFeGYjJnRzhY0QXuo4Isw.jpg", 
-            "https://example.com/2", "External", 0, true));
-        mockBanners.add(new Banner(3, "Top Gun: Maverick", 
-            "https://image.tmdb.org/t/p/original/odJ4hx6g6vBt4lBWKFD1tI8WS4x.jpg", 
-            "https://example.com/3", "External", 0, true));
-        mockBanners.add(new Banner(4, "Spider-Man: No Way Home", 
-            "https://image.tmdb.org/t/p/original/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg", 
-            "https://example.com/4", "External", 0, true));
-        banners.setValue(mockBanners);
+    private void loadPromotions() {
+        // Mock promotion data with beautiful images
+        List<Promotion> mockPromotions = new ArrayList<>();
+        
+        // Khuyến mãi đầu tuần - Cinema seats background
+        mockPromotions.add(new Promotion(1, "Khuyến mãi đầu tuần", 
+            "Giảm 20% cho vé xem phim vào thứ 2 và thứ 3", 
+            "2024-01-01", "2024-12-31", "percentage", 20.0,
+            "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&q=80"));
+        
+        // Combo bắp nước - Popcorn background
+        mockPromotions.add(new Promotion(2, "Combo bắp nước giá rẻ", 
+            "Chỉ 50.000đ cho combo bắp nước size L", 
+            "2024-01-01", "2024-12-31", "fixed_amount", 50000.0,
+            "https://images.unsplash.com/photo-1585647347384-2593bc35786b?w=800&q=80"));
+        
+        // Ưu đãi sinh viên - Cinema lights background
+        mockPromotions.add(new Promotion(3, "Ưu đãi sinh viên", 
+            "Giảm 30% cho sinh viên khi xuất trình thẻ", 
+            "2024-01-01", "2024-12-31", "percentage", 30.0,
+            "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800&q=80"));
+        
+        // Thành viên VIP - Premium cinema background
+        mockPromotions.add(new Promotion(4, "Thành viên VIP", 
+            "Tích điểm đổi vé miễn phí cho thành viên", 
+            "2024-01-01", "2024-12-31", "percentage", 0.0,
+            "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=800&q=80"));
+        
+        promotions.setValue(mockPromotions);
     }
     
     public void loadHomeData() {
@@ -106,17 +119,31 @@ public class HomeViewModel extends ViewModel {
     }
     
     private Movie createMockMovie(int id, String title, String posterUrl, 
-                                 String genres, double rating, int duration) {
+                                 String genres, double averageRating, int duration) {
         Movie movie = new Movie();
         movie.setMovieId(id);
         movie.setTitle(title);
         movie.setPosterUrl(posterUrl);
         movie.setGenres(new ArrayList<>(java.util.Arrays.asList(genres.split(", "))));
-        movie.setRating(rating);
+        movie.setAverageRating(averageRating);
         movie.setDuration(duration);
         movie.setReleaseDate("2024-01-01"); // Mock date
         movie.setDescription("A captivating movie experience.");
         movie.setTrailerUrl("https://youtube.com/watch?v=mock");
+        
+        // Set age rating based on movie for variety
+        if (id % 5 == 0) {
+            movie.setRating("P"); // Phổ biến
+        } else if (id % 4 == 0) {
+            movie.setRating("T13"); 
+        } else if (id % 3 == 0) {
+            movie.setRating("T16");
+        } else if (id % 2 == 0) {
+            movie.setRating("T18");
+        } else {
+            movie.setRating("C"); // Cấm trẻ em
+        }
+        
         return movie;
     }
     
@@ -125,8 +152,8 @@ public class HomeViewModel extends ViewModel {
         return isLoading;
     }
     
-    public LiveData<List<Banner>> getBanners() {
-        return banners;
+    public LiveData<List<Promotion>> getPromotions() {
+        return promotions;
     }
     
     public LiveData<List<Movie>> getNowShowingMovies() {

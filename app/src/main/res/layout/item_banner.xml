@@ -1,7 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView 
+<androidx.cardview.widget.CardView 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ivBanner"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scaleType="centerCrop"/>
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Background Image -->
+        <ImageView 
+            android:id="@+id/ivBanner"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"/>
+
+        <!-- Gradient Overlay -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/gradient_overlay"/>
+
+        <!-- Text Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="bottom"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvPromotionName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Khuyến mãi"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:shadowColor="#80000000"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4"/>
+
+            <TextView
+                android:id="@+id/tvPromotionDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mô tả khuyến mãi"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:shadowColor="#80000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="3"/>
+
+            <TextView
+                android:id="@+id/tvPromotionDiscount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GIẢM 20%"
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_discount_badge"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:layout_marginTop="8dp"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</androidx.cardview.widget.CardView>

@@ -10,7 +10,8 @@ public class Movie {
     private String trailerUrl;
     private int duration;
     private String releaseDate;
-    private double rating;
+    private String rating; // Age rating: "P", "T13", "T16", "T18", "C", "R"
+    private double averageRating; // Average rating score (0-10)
     private String status; // "NowShowing", "ComingSoon"
     private List<String> genres;
     
@@ -18,11 +19,11 @@ public class Movie {
     public Movie() {
     }
     
-    public Movie(int movieId, String title, String posterUrl, double rating) {
+    public Movie(int movieId, String title, String posterUrl, double averageRating) {
         this.movieId = movieId;
         this.title = title;
         this.posterUrl = posterUrl;
-        this.rating = rating;
+        this.averageRating = averageRating;
     }
     
     // Getters and Setters
@@ -82,12 +83,20 @@ public class Movie {
         this.releaseDate = releaseDate;
     }
     
-    public double getRating() {
+    public String getRating() {
         return rating;
     }
     
-    public void setRating(double rating) {
+    public void setRating(String rating) {
         this.rating = rating;
+    }
+    
+    public double getAverageRating() {
+        return averageRating;
+    }
+    
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
     }
     
     public String getStatus() {
