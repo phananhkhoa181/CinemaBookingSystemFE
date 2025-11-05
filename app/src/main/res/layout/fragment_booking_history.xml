@@ -10,56 +10,14 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/backgroundColor"
         android:elevation="4dp"
-        app:title="Lịch sử đặt vé"/>
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chipGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="12dp"
-        app:singleSelection="true"
-        app:selectionRequired="true">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipAll"
-            style="@style/Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tất cả"
-            android:checked="true"/>
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipPending"
-            style="@style/Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chờ thanh toán"/>
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipConfirmed"
-            style="@style/Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Đã xác nhận"/>
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipCompleted"
-            style="@style/Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hoàn thành"/>
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipCancelled"
-            style="@style/Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Đã hủy"/>
-
-    </com.google.android.material.chip.ChipGroup>
+        android:paddingTop="40dp"
+        android:paddingBottom="24dp"
+        app:title="Lịch Sử Giao Dịch"
+        app:titleTextColor="@color/colorPrimary"
+        app:titleTextAppearance="@style/ToolbarTitleCentered"/>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefresh"
@@ -72,7 +30,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:padding="12dp"/>
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

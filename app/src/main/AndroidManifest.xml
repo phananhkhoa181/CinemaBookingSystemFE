@@ -61,6 +61,12 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
         
+        <!-- Booking Detail Activity -->
+        <activity
+            android:name=".ui.bookingdetail.BookingDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        
         <!-- TODO: Thêm các Activities khác khi implement -->
         <!-- MovieDetailActivity, ProfileEditActivity, etc. -->
         

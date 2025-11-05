@@ -12,6 +12,8 @@
     <color name="colorAccent">#FFB800</color>
     
     <!-- Background Colors -->
+    <color name="colorBackground">#141414</color>
+    <color name="colorSurface">#1F1F1F</color>
     <color name="backgroundColor">#141414</color>
     <color name="backgroundCard">#1F1F1F</color>
     <color name="backgroundDialog">#2B2B2B</color>
@@ -36,6 +38,7 @@
     
     <!-- Status Colors -->
     <color name="statusSuccess">#4CAF50</color>
+        <color name="colorAgeChip">#FF9800</color>
     <color name="statusError">#F44336</color>
     <color name="statusWarning">#FF9800</color>
     <color name="statusInfo">#2196F3</color>

@@ -1,138 +1,143 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView 
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/spacing_md">
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@color/backgroundCard">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/spacing_md">
+        android:orientation="horizontal"
+        android:padding="16dp">
 
-        <!-- Header: Booking ID + Status -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="@dimen/spacing_sm">
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="70dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_vertical"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="0dp">
 
-            <TextView
-                android:id="@+id/tvBookingId"
-                style="@style/Text.Caption"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="#BK12345"/>
-
-            <TextView
-                android:id="@+id/tvStatus"
-                style="@style/Text.Caption"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="4dp"
-                android:background="@drawable/bg_status_confirmed"
-                android:textColor="@android:color/white"
-                android:text="Đã xác nhận"/>
-
-        </LinearLayout>
-
-        <!-- Movie Info -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="@dimen/spacing_sm">
-
-            <!-- Poster -->
             <ImageView
                 android:id="@+id/ivPoster"
-                android:layout_width="60dp"
-                android:layout_height="90dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:background="@drawable/bg_poster"/>
 
-            <!-- Details -->
-            <LinearLayout
-                android:layout_width="0dp"
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="16dp">
+
+            <TextView
+                android:id="@+id/tvMovieTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/spacing_md"
-                android:orientation="vertical">
+                android:text="Avengers: Endgame"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/textPrimary"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
 
                 <TextView
-                    android:id="@+id/tvMovieTitle"
-                    style="@style/Text.Heading3"
+                    android:id="@+id/tvFormat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:maxLines="2"
-                    android:ellipsize="end"
-                    android:text="Avengers: Endgame"/>
+                    android:text="2D - SUB"
+                    android:textSize="12sp"
+                    android:textColor="@color/textSecondary"/>
 
                 <TextView
-                    android:id="@+id/tvCinema"
-                    style="@style/Text.BodySecondary"
+                    android:id="@+id/tvAge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_xs"
-                    android:text="CGV Vincom Center"/>
-
-                <TextView
-                    android:id="@+id/tvShowtime"
-                    style="@style/Text.Body"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_xs"
-                    android:text="19:30 - 29/10/2025"/>
-
-                <TextView
-                    android:id="@+id/tvSeats"
-                    style="@style/Text.BodySecondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_xs"
-                    android:text="Ghế: A1, A2"/>
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_status_age"
+                    android:textColor="@android:color/white"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="2dp"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:text="C18"/>
 
             </LinearLayout>
 
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/divider_height"
-            android:layout_marginVertical="@dimen/spacing_sm"
-            android:background="@color/divider"/>
-
-        <!-- Price + Action Button -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
             <TextView
-                android:id="@+id/tvTotalPrice"
-                style="@style/Text.Heading3"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="240.000 đ"
-                android:textColor="@color/colorPrimary"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAction"
-                style="@style/Button.Outlined"
+                android:id="@+id/tvCinema"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Xem chi tiết"/>
+                android:layout_marginTop="8dp"
+                android:text="Galaxy Nguyễn Du - Rạp 2"
+                android:textSize="13sp"
+                android:textColor="@color/textPrimary"/>
+
+            <TextView
+                android:id="@+id/tvShowtime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="19:30 - Thứ Ba, 29/10/2025"
+                android:textSize="13sp"
+                android:textColor="@color/textSecondary"/>
+
+            <TextView
+                android:id="@+id/tvSeats"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Ghế: A1, A2"
+                android:textSize="12sp"
+                android:textColor="@color/textSecondary"/>
+
+            <TextView
+                android:id="@+id/tvBookingId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="#BK17622700263591"
+                android:textSize="11sp"
+                android:textColor="@color/textHint"/>
 
         </LinearLayout>
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tvTotalPrice"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAction"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"/>
 
 </com.google.android.material.card.MaterialCardView>

@@ -14,8 +14,11 @@ import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.data.model.Booking;
 import com.google.android.material.button.MaterialButton;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingViewHolder> {
     
@@ -56,6 +59,7 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
     
     class BookingViewHolder extends RecyclerView.ViewHolder {
         TextView tvBookingId, tvStatus, tvMovieTitle, tvCinema, tvShowtime, tvSeats, tvTotalPrice;
+        TextView tvFormat, tvAge;
         ImageView ivPoster;
         MaterialButton btnAction;
         
@@ -68,10 +72,13 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             tvShowtime = itemView.findViewById(R.id.tvShowtime);
             tvSeats = itemView.findViewById(R.id.tvSeats);
             tvTotalPrice = itemView.findViewById(R.id.tvTotalPrice);
+            tvFormat = itemView.findViewById(R.id.tvFormat);
+            tvAge = itemView.findViewById(R.id.tvAge);
             ivPoster = itemView.findViewById(R.id.ivPoster);
             btnAction = itemView.findViewById(R.id.btnAction);
             
-            btnAction.setOnClickListener(v -> {
+            // Click whole card to view details
+            itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && listener != null) {
                     listener.onBookingClick(bookings.get(position));
@@ -81,65 +88,73 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         
         void bind(Booking booking) {
             tvBookingId.setText("#" + booking.getBookingCode());
-            tvMovieTitle.setText(booking.getMovieTitle());
-            tvCinema.setText(booking.getCinemaName());
-            tvShowtime.setText(booking.getShowtimeFormatted());
-            tvSeats.setText("Ghế: " + booking.getSeatsString());
-            tvTotalPrice.setText(booking.getTotalPriceFormatted());
             
-            // Set status badge
-            setStatusBadge(booking.getStatus());
-            
-            // Load poster
-            Glide.with(ivPoster.getContext())
-                .load(booking.getMoviePosterUrl())
-                .into(ivPoster);
+            // Access nested objects
+            if (booking.getMovie() != null) {
+                tvMovieTitle.setText(booking.getMovie().getTitle());
                 
-            // Set action button based on status
-            setActionButton(booking.getStatus());
-        }
-        
-        private void setStatusBadge(String status) {
-            int backgroundRes;
-            String statusText;
-            
-            switch (status) {
-                case "Pending":
-                    backgroundRes = R.drawable.bg_status_pending;
-                    statusText = "Chờ thanh toán";
-                    break;
-                case "Confirmed":
-                    backgroundRes = R.drawable.bg_status_confirmed;
-                    statusText = "Đã xác nhận";
-                    break;
-                case "Completed":
-                    backgroundRes = R.drawable.bg_status_completed;
-                    statusText = "Hoàn thành";
-                    break;
-                case "Cancelled":
-                    backgroundRes = R.drawable.bg_status_cancelled;
-                    statusText = "Đã hủy";
-                    break;
-                default:
-                    backgroundRes = R.drawable.bg_status_pending;
-                    statusText = status;
+                // Load poster
+                Glide.with(ivPoster.getContext())
+                    .load(booking.getMovie().getPosterUrl())
+                    .into(ivPoster);
+                
+                // Set format (2D/3D) and age rating
+                tvFormat.setText("2D - SUB"); // TODO: Get from movie data
+                tvAge.setText("C18"); // TODO: Get from movie data
             }
             
-            tvStatus.setBackgroundResource(backgroundRes);
-            tvStatus.setText(statusText);
+            if (booking.getCinema() != null) {
+                tvCinema.setText(booking.getCinema().getName());
+            }
+            
+            if (booking.getShowtime() != null) {
+                String showtime = booking.getShowtime().getStartTime();
+                tvShowtime.setText(formatShowtime(showtime));
+            }
+            
+            tvSeats.setText("Ghế: " + booking.getSeatsDisplay());
         }
         
-        private void setActionButton(String status) {
-            if ("Pending".equals(status)) {
-                btnAction.setText("Thanh toán");
-                btnAction.setVisibility(View.VISIBLE);
-            } else if ("Confirmed".equals(status)) {
-                btnAction.setText("Xem vé");
-                btnAction.setVisibility(View.VISIBLE);
-            } else {
-                btnAction.setText("Xem chi tiết");
-                btnAction.setVisibility(View.VISIBLE);
+        private String formatShowtime(String datetime) {
+            try {
+                Date date = null;
+                
+                // Try multiple formats
+                String[] possibleFormats = {
+                    "yyyy-MM-dd'T'HH:mm:ss",
+                    "yyyy-MM-dd HH:mm:ss",
+                    "yyyy-MM-dd'T'HH:mm:ss.SSS",
+                    "dd/MM/yyyy HH:mm"
+                };
+                
+                for (String format : possibleFormats) {
+                    try {
+                        SimpleDateFormat inputFormat = new SimpleDateFormat(format, Locale.getDefault());
+                        date = inputFormat.parse(datetime);
+                        if (date != null) break;
+                    } catch (Exception ignored) {}
+                }
+                
+                if (date != null) {
+                    // Output format: "19:30 - Thứ Ba, 21/07/2020"
+                    SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                    SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("vi", "VN"));
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    
+                    String time = timeFormat.format(date);
+                    String day = dayFormat.format(date);
+                    String dateStr = dateFormat.format(date);
+                    
+                    // Capitalize first letter of day
+                    day = day.substring(0, 1).toUpperCase() + day.substring(1);
+                    
+                    return time + " - " + day + ", " + dateStr;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            // Return original if parsing fails
+            return datetime;
         }
     }
 }

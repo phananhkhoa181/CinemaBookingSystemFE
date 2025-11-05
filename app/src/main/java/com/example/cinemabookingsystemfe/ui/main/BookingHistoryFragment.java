@@ -2,6 +2,7 @@ package com.example.cinemabookingsystemfe.ui.main;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +20,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.ui.adapters.BookingAdapter;
-import com.google.android.material.chip.ChipGroup;
+import com.example.cinemabookingsystemfe.ui.bookingdetail.BookingDetailActivity;
 
 public class BookingHistoryFragment extends Fragment {
     
@@ -26,12 +28,10 @@ public class BookingHistoryFragment extends Fragment {
     private SwipeRefreshLayout swipeRefresh;
     private View layoutEmpty;
     private ProgressBar progressBar;
-    private ChipGroup chipGroup;
+    private Toolbar toolbar;
     
     private BookingHistoryViewModel viewModel;
     private BookingAdapter adapter;
-    
-    private String currentFilter = "All";
     
     @Nullable
     @Override
@@ -46,8 +46,8 @@ public class BookingHistoryFragment extends Fragment {
         setupListeners();
         observeViewModel();
         
-        // Load bookings
-        viewModel.loadBookings(currentFilter);
+        // Load all bookings
+        viewModel.loadBookings("All");
         
         return view;
     }
@@ -57,7 +57,25 @@ public class BookingHistoryFragment extends Fragment {
         swipeRefresh = view.findViewById(R.id.swipeRefresh);
         layoutEmpty = view.findViewById(R.id.layoutEmpty);
         progressBar = view.findViewById(R.id.progressBar);
-        chipGroup = view.findViewById(R.id.chipGroup);
+        toolbar = view.findViewById(R.id.toolbar);
+        
+        // Setup toolbar - center the title
+        if (toolbar != null) {
+            toolbar.post(() -> {
+                for (int i = 0; i < toolbar.getChildCount(); i++) {
+                    View child = toolbar.getChildAt(i);
+                    if (child instanceof android.widget.TextView) {
+                        android.widget.TextView textView = (android.widget.TextView) child;
+                        Toolbar.LayoutParams params = (Toolbar.LayoutParams) textView.getLayoutParams();
+                        params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                        params.gravity = Gravity.CENTER;
+                        textView.setLayoutParams(params);
+                        textView.setGravity(Gravity.CENTER);
+                        break;
+                    }
+                }
+            });
+        }
     }
     
     private void initViewModel() {
@@ -76,28 +94,7 @@ public class BookingHistoryFragment extends Fragment {
     private void setupListeners() {
         // Pull to refresh
         swipeRefresh.setOnRefreshListener(() -> {
-            viewModel.loadBookings(currentFilter);
-        });
-        
-        // Filter chips
-        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            if (!checkedIds.isEmpty()) {
-                int checkedId = checkedIds.get(0);
-                
-                if (checkedId == R.id.chipAll) {
-                    currentFilter = "All";
-                } else if (checkedId == R.id.chipPending) {
-                    currentFilter = "Pending";
-                } else if (checkedId == R.id.chipConfirmed) {
-                    currentFilter = "Confirmed";
-                } else if (checkedId == R.id.chipCompleted) {
-                    currentFilter = "Completed";
-                } else if (checkedId == R.id.chipCancelled) {
-                    currentFilter = "Cancelled";
-                }
-                
-                viewModel.loadBookings(currentFilter);
-            }
+            viewModel.loadBookings("All");
         });
     }
     
@@ -129,9 +126,8 @@ public class BookingHistoryFragment extends Fragment {
     }
     
     private void navigateToBookingDetail(int bookingId) {
-        // Intent intent = new Intent(getContext(), BookingDetailActivity.class);
-        // intent.putExtra("BOOKING_ID", bookingId);
-        // startActivity(intent);
-        Toast.makeText(getContext(), "Booking ID: " + bookingId, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getContext(), BookingDetailActivity.class);
+        intent.putExtra("BOOKING_ID", bookingId);
+        startActivity(intent);
     }
 }

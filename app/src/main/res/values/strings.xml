@@ -62,5 +62,8 @@
     <string name="error_network">Lỗi kết nối mạng</string>
     <string name="error_login_failed">Đăng nhập thất bại</string>
     
+    <!-- Content Descriptions -->
+    <string name="movie_poster">Poster phim</string>
+    
     <!-- TODO: Thêm các string khác khi implement -->
 </resources>

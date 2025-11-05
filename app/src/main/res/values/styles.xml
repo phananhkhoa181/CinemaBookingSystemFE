@@ -85,4 +85,11 @@
         <item name="checkedIconVisible">false</item>
     </style>
     
+    <!-- Toolbar Title Centered Style -->
+    <style name="ToolbarTitleCentered" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+    
 </resources>
