@@ -85,4 +85,10 @@
         <item name="checkedIconVisible">false</item>
     </style>
     
+    <!-- Rounded Image View Style -->
+    <style name="RoundedImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+    
 </resources>

@@ -91,11 +91,8 @@ public class SeatView extends FrameLayout {
             // Seat already booked
             backgroundRes = R.drawable.bg_seat_occupied;
         } else if (seat.isVIP()) {
-            // VIP seat
+            // VIP seat (available)
             backgroundRes = R.drawable.bg_seat_vip;
-        } else if (seat.isCouple()) {
-            // Couple seat
-            backgroundRes = R.drawable.bg_seat_couple;
         } else {
             // Standard available seat
             backgroundRes = R.drawable.bg_seat_available;

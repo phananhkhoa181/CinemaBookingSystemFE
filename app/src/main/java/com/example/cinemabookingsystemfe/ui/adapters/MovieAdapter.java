@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.cinemabookingsystemfe.R;
-import com.example.cinemabookingsystemfe.data.model.Movie;
+import com.example.cinemabookingsystemfe.data.models.response.Movie;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +78,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
         void bind(Movie movie) {
             tvTitle.setText(movie.getTitle());
             tvGenre.setText(movie.getGenresString());
-            tvRating.setText(String.format("%.1f", movie.getAverageRating()));
+            
+            // Hide rating in list view (only show in detail)
+            tvRating.setVisibility(View.GONE);
+            
             tvDuration.setText(movie.getDuration() + "'");
             
             // Age rating badge (rating field from backend)

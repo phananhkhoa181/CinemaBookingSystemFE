@@ -31,27 +31,17 @@ public class SplashActivity extends AppCompatActivity {
         try {
             setContentView(R.layout.activity_splash);
             
-            // Check if user is logged in after splash delay
+            // Always go to MainActivity after splash delay
+            // Login check will be done when user tries to book ticket
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 try {
-                    com.example.cinemabookingsystemfe.utils.SharedPrefsManager prefsManager = 
-                        com.example.cinemabookingsystemfe.utils.SharedPrefsManager.getInstance(this);
-                    
-                    Intent intent;
-                    if (prefsManager.isLoggedIn()) {
-                        // User already logged in -> go to MainActivity
-                        intent = new Intent(SplashActivity.this, com.example.cinemabookingsystemfe.ui.main.MainActivity.class);
-                    } else {
-                        // Not logged in -> go to LoginActivity
-                        intent = new Intent(SplashActivity.this, LoginActivity.class);
-                    }
-                    
+                    Intent intent = new Intent(SplashActivity.this, com.example.cinemabookingsystemfe.ui.main.MainActivity.class);
                     startActivity(intent);
                     finish();
                 } catch (Exception e) {
                     e.printStackTrace();
-                    // If error, go to LoginActivity
-                    Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                    // If error, still try to go to MainActivity
+                    Intent intent = new Intent(SplashActivity.this, com.example.cinemabookingsystemfe.ui.main.MainActivity.class);
                     startActivity(intent);
                     finish();
                 }

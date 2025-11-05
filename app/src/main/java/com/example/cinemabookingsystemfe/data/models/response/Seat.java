@@ -8,29 +8,29 @@ import com.google.gson.annotations.SerializedName;
  */
 public class Seat {
     
-    @SerializedName("seat_id")
+    @SerializedName("seatid")
     private int seatId;
     
-    @SerializedName("auditorium_id")
+    @SerializedName("auditoriumid")
     private int auditoriumId;
     
-    @SerializedName("seat_number")
-    private String seatNumber; // "A1", "B5", "H10"
-    
     @SerializedName("row")
-    private String row; // "A", "B", "C"... "H"
+    private String row; // "A", "B", "C"...
     
-    @SerializedName("column")
-    private int column; // 1-10
+    @SerializedName("number")
+    private int number; // Column number 1, 2, 3...
     
-    @SerializedName("type")
-    private String type; // "Standard", "VIP", "Couple"
+    @SerializedName("seattype")
+    private String type; // "Standard", "VIP" (no Couple)
     
-    @SerializedName("status")
-    private String status; // "Available", "Occupied", "Maintenance"
+    @SerializedName("isAvailableForShowtime")
+    private boolean isAvailable; // true = available, false = occupied
     
-    @SerializedName("price")
-    private double price;
+    // Client-side computed fields
+    private String seatNumber; // Computed: row + number (e.g., "A1", "B5")
+    private int column; // Same as number
+    private String status; // Computed: "AVAILABLE" or "OCCUPIED"
+    private double price; // From Showtime API
     
     // Client-side state
     private boolean isSelected = false;
@@ -38,14 +38,25 @@ public class Seat {
     // Constructors
     public Seat() {}
     
-    public Seat(int seatId, String seatNumber, String row, int column, String type, String status, double price) {
+    public Seat(int seatId, String row, int number, String type, boolean isAvailable, double price) {
         this.seatId = seatId;
-        this.seatNumber = seatNumber;
         this.row = row;
-        this.column = column;
+        this.number = number;
+        this.column = number; // Same as number
         this.type = type;
-        this.status = status;
+        this.isAvailable = isAvailable;
         this.price = price;
+        
+        // Compute derived fields
+        this.seatNumber = row + number; // e.g., "A1", "B5"
+        this.status = isAvailable ? "AVAILABLE" : "OCCUPIED";
+    }
+    
+    // Helper method to initialize computed fields after JSON deserialization
+    public void initializeComputedFields() {
+        this.seatNumber = row + number;
+        this.column = number;
+        this.status = isAvailable ? "AVAILABLE" : "OCCUPIED";
     }
     
     // Getters and Setters
@@ -81,6 +92,16 @@ public class Seat {
         this.row = row;
     }
     
+    public int getNumber() {
+        return number;
+    }
+    
+    public void setNumber(int number) {
+        this.number = number;
+        this.column = number;
+        this.seatNumber = row + number;
+    }
+    
     public int getColumn() {
         return column;
     }
@@ -95,6 +116,15 @@ public class Seat {
     
     public void setType(String type) {
         this.type = type;
+    }
+    
+    public boolean getIsAvailable() {
+        return isAvailable;
+    }
+    
+    public void setIsAvailable(boolean available) {
+        this.isAvailable = available;
+        this.status = available ? "AVAILABLE" : "OCCUPIED";
     }
     
     public String getStatus() {
@@ -122,18 +152,14 @@ public class Seat {
     }
     
     public boolean isAvailable() {
-        return "Available".equalsIgnoreCase(status);
+        return isAvailable;
     }
     
     public boolean isOccupied() {
-        return "Occupied".equalsIgnoreCase(status);
+        return !isAvailable;
     }
     
     public boolean isVIP() {
         return "VIP".equalsIgnoreCase(type);
-    }
-    
-    public boolean isCouple() {
-        return "Couple".equalsIgnoreCase(type);
     }
 }

@@ -18,6 +18,7 @@ public class MovieDetailResponse {
     private int totalReviews;
     private int totalShowtimes;
     private String backdropUrl;
+    private String status; // "NowShowing" or "ComingSoon"
 
     // ✅ Getters & setters đầy đủ
     public int getMovieId() { return movieId; }
@@ -64,4 +65,7 @@ public class MovieDetailResponse {
 
     public String getBackdropUrl() { return backdropUrl; }
     public void setBackdropUrl(String backdropUrl) { this.backdropUrl = backdropUrl; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

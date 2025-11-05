@@ -11,19 +11,24 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.cinemabookingsystemfe.R;
-import com.example.cinemabookingsystemfe.data.model.Booking;
-import com.google.android.material.button.MaterialButton;
+import com.example.cinemabookingsystemfe.data.models.response.BookingListResponse;
+import com.google.android.material.chip.Chip;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingViewHolder> {
     
-    private List<Booking> bookings;
+    private List<BookingListResponse> bookings;
     private OnBookingClickListener listener;
     
     public interface OnBookingClickListener {
-        void onBookingClick(Booking booking);
+        void onBookingClick(BookingListResponse booking);
     }
     
     public BookingAdapter(OnBookingClickListener listener) {
@@ -31,8 +36,8 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
         this.listener = listener;
     }
     
-    public void setBookings(List<Booking> bookings) {
-        this.bookings = bookings;
+    public void setBookings(List<BookingListResponse> bookings) {
+        this.bookings = bookings != null ? bookings : new ArrayList<>();
         notifyDataSetChanged();
     }
     
@@ -55,23 +60,22 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
     }
     
     class BookingViewHolder extends RecyclerView.ViewHolder {
-        TextView tvBookingId, tvStatus, tvMovieTitle, tvCinema, tvShowtime, tvSeats, tvTotalPrice;
         ImageView ivPoster;
-        MaterialButton btnAction;
+        TextView tvMovieTitle, tvFormat, tvCinemaName, tvShowtime, tvSeats, tvTotalAmount;
+        Chip chipStatus;
         
         BookingViewHolder(View itemView) {
             super(itemView);
-            tvBookingId = itemView.findViewById(R.id.tvBookingId);
-            tvStatus = itemView.findViewById(R.id.tvStatus);
+            ivPoster = itemView.findViewById(R.id.ivPoster);
             tvMovieTitle = itemView.findViewById(R.id.tvMovieTitle);
-            tvCinema = itemView.findViewById(R.id.tvCinema);
+            tvFormat = itemView.findViewById(R.id.tvFormat);
+            tvCinemaName = itemView.findViewById(R.id.tvCinemaName);
             tvShowtime = itemView.findViewById(R.id.tvShowtime);
             tvSeats = itemView.findViewById(R.id.tvSeats);
-            tvTotalPrice = itemView.findViewById(R.id.tvTotalPrice);
-            ivPoster = itemView.findViewById(R.id.ivPoster);
-            btnAction = itemView.findViewById(R.id.btnAction);
+            tvTotalAmount = itemView.findViewById(R.id.tvTotalAmount);
+            chipStatus = itemView.findViewById(R.id.chipStatus);
             
-            btnAction.setOnClickListener(v -> {
+            itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && listener != null) {
                     listener.onBookingClick(bookings.get(position));
@@ -79,67 +83,86 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
             });
         }
         
-        void bind(Booking booking) {
-            tvBookingId.setText("#" + booking.getBookingCode());
-            tvMovieTitle.setText(booking.getMovieTitle());
-            tvCinema.setText(booking.getCinemaName());
-            tvShowtime.setText(booking.getShowtimeFormatted());
-            tvSeats.setText("Ghế: " + booking.getSeatsString());
-            tvTotalPrice.setText(booking.getTotalPriceFormatted());
-            
-            // Set status badge
-            setStatusBadge(booking.getStatus());
-            
-            // Load poster
-            Glide.with(ivPoster.getContext())
-                .load(booking.getMoviePosterUrl())
-                .into(ivPoster);
+        void bind(BookingListResponse booking) {
+            // Movie title
+            if (booking.getMovie() != null) {
+                tvMovieTitle.setText(booking.getMovie().getTitle());
                 
-            // Set action button based on status
-            setActionButton(booking.getStatus());
+                // Load poster
+                Glide.with(ivPoster.getContext())
+                    .load(booking.getMovie().getPosterUrl())
+                    .placeholder(R.drawable.ic_empty_bookings)
+                    .error(R.drawable.ic_empty_bookings)
+                    .into(ivPoster);
+            }
+            
+            // Format & Language Type
+            if (booking.getShowtime() != null) {
+                String format = booking.getShowtime().getFormat() != null ? booking.getShowtime().getFormat() : "";
+                String lang = booking.getShowtime().getLanguageType() != null ? booking.getShowtime().getLanguageType() : "";
+                tvFormat.setText(format + (lang.isEmpty() ? "" : " • " + lang));
+                
+                // Showtime
+                tvShowtime.setText(formatShowtime(booking.getShowtime().getStartTime()));
+            }
+            
+            // Cinema name
+            if (booking.getCinema() != null) {
+                tvCinemaName.setText(booking.getCinema().getName());
+            }
+            
+            // Seats
+            if (booking.getSeats() != null && !booking.getSeats().isEmpty()) {
+                tvSeats.setText("Ghế: " + String.join(", ", booking.getSeats()));
+            }
+            
+            // Total amount
+            DecimalFormat formatter = new DecimalFormat("#,###");
+            tvTotalAmount.setText(formatter.format(booking.getTotalAmount()) + "đ");
+            
+            // Status
+            setStatusChip(booking.getStatus());
         }
         
-        private void setStatusBadge(String status) {
-            int backgroundRes;
+        private String formatShowtime(String startTime) {
+            try {
+                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+                SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy", Locale.getDefault());
+                Date date = inputFormat.parse(startTime);
+                return outputFormat.format(date);
+            } catch (ParseException e) {
+                return startTime;
+            }
+        }
+        
+        private void setStatusChip(String status) {
+            int colorRes;
             String statusText;
             
             switch (status) {
                 case "Pending":
-                    backgroundRes = R.drawable.bg_status_pending;
-                    statusText = "Chờ thanh toán";
+                    statusText = "Chờ xử lý";
+                    colorRes = R.color.statusPending;
                     break;
                 case "Confirmed":
-                    backgroundRes = R.drawable.bg_status_confirmed;
                     statusText = "Đã xác nhận";
+                    colorRes = R.color.colorPrimary;
                     break;
                 case "Completed":
-                    backgroundRes = R.drawable.bg_status_completed;
                     statusText = "Hoàn thành";
+                    colorRes = R.color.statusSuccess;
                     break;
                 case "Cancelled":
-                    backgroundRes = R.drawable.bg_status_cancelled;
                     statusText = "Đã hủy";
+                    colorRes = R.color.statusCancelled;
                     break;
                 default:
-                    backgroundRes = R.drawable.bg_status_pending;
                     statusText = status;
+                    colorRes = R.color.textSecondary;
             }
             
-            tvStatus.setBackgroundResource(backgroundRes);
-            tvStatus.setText(statusText);
-        }
-        
-        private void setActionButton(String status) {
-            if ("Pending".equals(status)) {
-                btnAction.setText("Thanh toán");
-                btnAction.setVisibility(View.VISIBLE);
-            } else if ("Confirmed".equals(status)) {
-                btnAction.setText("Xem vé");
-                btnAction.setVisibility(View.VISIBLE);
-            } else {
-                btnAction.setText("Xem chi tiết");
-                btnAction.setVisibility(View.VISIBLE);
-            }
+            chipStatus.setText(statusText);
+            chipStatus.setChipBackgroundColorResource(colorRes);
         }
     }
 }

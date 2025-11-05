@@ -1,17 +1,34 @@
 package com.example.cinemabookingsystemfe.data.models.response;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * PagedResult - Pagination wrapper
+ * PagedResult - Pagination wrapper matching API response
  * @param <T> Item type
  */
 public class PagedResult<T> {
+    
+    @SerializedName("items")
     private List<T> items;
-    private int totalCount;
-    private int page;
+    
+    @SerializedName("currentPage")
+    private int currentPage;
+    
+    @SerializedName("pageSize")
     private int pageSize;
+    
+    @SerializedName("totalPages")
     private int totalPages;
+    
+    @SerializedName("totalItems")
+    private int totalItems;
+    
+    @SerializedName("hasNextPage")
+    private boolean hasNextPage;
+    
+    @SerializedName("hasPreviousPage")
+    private boolean hasPreviousPage;
     
     public PagedResult() {}
     
@@ -24,20 +41,12 @@ public class PagedResult<T> {
         this.items = items;
     }
     
-    public int getTotalCount() {
-        return totalCount;
+    public int getCurrentPage() {
+        return currentPage;
     }
     
-    public void setTotalCount(int totalCount) {
-        this.totalCount = totalCount;
-    }
-    
-    public int getPage() {
-        return page;
-    }
-    
-    public void setPage(int page) {
-        this.page = page;
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
     }
     
     public int getPageSize() {
@@ -54,5 +63,29 @@ public class PagedResult<T> {
     
     public void setTotalPages(int totalPages) {
         this.totalPages = totalPages;
+    }
+    
+    public int getTotalItems() {
+        return totalItems;
+    }
+    
+    public void setTotalItems(int totalItems) {
+        this.totalItems = totalItems;
+    }
+    
+    public boolean isHasNextPage() {
+        return hasNextPage;
+    }
+    
+    public void setHasNextPage(boolean hasNextPage) {
+        this.hasNextPage = hasNextPage;
+    }
+    
+    public boolean isHasPreviousPage() {
+        return hasPreviousPage;
+    }
+    
+    public void setHasPreviousPage(boolean hasPreviousPage) {
+        this.hasPreviousPage = hasPreviousPage;
     }
 }

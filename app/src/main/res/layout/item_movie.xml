@@ -4,13 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="140dp"
-    android:layout_height="290dp"
+    android:layout_height="wrap_content"
     android:layout_marginEnd="12dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -59,75 +56,51 @@
 
         </FrameLayout>
 
-        <!-- Movie Info -->
+        <!-- Movie Info - Fixed height to align all cards -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="95dp"
             android:orientation="vertical"
             android:padding="8dp"
             android:background="@color/cardBackground">
 
-            <!-- Title -->
+            <!-- Title - Fixed 2 lines -->
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="36dp"
                 android:textSize="14sp"
                 android:maxLines="2"
                 android:ellipsize="end"
                 android:textColor="@color/textPrimary"
                 android:textStyle="bold"
+                android:gravity="top"
                 tools:text="Avengers: Endgame"/>
 
-            <!-- Genre -->
+            <!-- Genre - Fixed 1 line -->
             <TextView
                 android:id="@+id/tvGenre"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="16dp"
                 android:layout_marginTop="2dp"
                 android:textSize="11sp"
                 android:maxLines="1"
                 android:ellipsize="end"
                 android:textColor="@color/textSecondary"
+                android:gravity="top"
                 tools:text="Action, Sci-Fi"/>
 
-            <!-- Spacer to push rating to bottom -->
+            <!-- Spacer - Fixed height -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_height="8dp"/>
 
-            <!-- Rating and Duration Row - always at bottom -->
+            <!-- Duration Row - Fixed position at bottom -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="bottom">
-                
-                <!-- Rating group -->
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:layout_gravity="bottom"
-                    android:src="@drawable/ic_star"
-                    app:tint="@color/ratingColor"/>
-                    
-                <TextView
-                    android:id="@+id/tvRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginStart="4dp"
-                    android:textSize="12sp"
-                    android:textColor="@color/textPrimary"
-                    android:textStyle="bold"
-                    tools:text="8.4"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"/>
+                android:gravity="center_vertical">
 
                 <!-- Duration group -->
                 <ImageView
@@ -147,6 +120,13 @@
                     android:textSize="12sp"
                     android:textColor="@color/textSecondary"
                     tools:text="181'"/>
+                
+                <!-- Hidden rating (for compatibility) -->
+                <TextView
+                    android:id="@+id/tvRating"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"/>
                     
             </LinearLayout>
 

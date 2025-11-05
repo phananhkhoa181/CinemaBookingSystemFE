@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.cinemabookingsystemfe.R;
+import com.example.cinemabookingsystemfe.data.models.response.BookingListResponse;
 import com.example.cinemabookingsystemfe.ui.adapters.BookingAdapter;
-import com.google.android.material.chip.ChipGroup;
 
 public class BookingHistoryFragment extends Fragment {
     
@@ -26,12 +26,11 @@ public class BookingHistoryFragment extends Fragment {
     private SwipeRefreshLayout swipeRefresh;
     private View layoutEmpty;
     private ProgressBar progressBar;
-    private ChipGroup chipGroup;
     
     private BookingHistoryViewModel viewModel;
     private BookingAdapter adapter;
     
-    private String currentFilter = "All";
+    private String currentFilter = null; // null = all statuses
     
     @Nullable
     @Override
@@ -57,7 +56,6 @@ public class BookingHistoryFragment extends Fragment {
         swipeRefresh = view.findViewById(R.id.swipeRefresh);
         layoutEmpty = view.findViewById(R.id.layoutEmpty);
         progressBar = view.findViewById(R.id.progressBar);
-        chipGroup = view.findViewById(R.id.chipGroup);
     }
     
     private void initViewModel() {
@@ -66,7 +64,7 @@ public class BookingHistoryFragment extends Fragment {
     
     private void setupRecyclerView() {
         adapter = new BookingAdapter(booking -> {
-            navigateToBookingDetail(booking.getBookingId());
+            navigateToBookingDetail(booking);
         });
         
         rvBookings.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -77,27 +75,6 @@ public class BookingHistoryFragment extends Fragment {
         // Pull to refresh
         swipeRefresh.setOnRefreshListener(() -> {
             viewModel.loadBookings(currentFilter);
-        });
-        
-        // Filter chips
-        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            if (!checkedIds.isEmpty()) {
-                int checkedId = checkedIds.get(0);
-                
-                if (checkedId == R.id.chipAll) {
-                    currentFilter = "All";
-                } else if (checkedId == R.id.chipPending) {
-                    currentFilter = "Pending";
-                } else if (checkedId == R.id.chipConfirmed) {
-                    currentFilter = "Confirmed";
-                } else if (checkedId == R.id.chipCompleted) {
-                    currentFilter = "Completed";
-                } else if (checkedId == R.id.chipCancelled) {
-                    currentFilter = "Cancelled";
-                }
-                
-                viewModel.loadBookings(currentFilter);
-            }
         });
     }
     
@@ -128,10 +105,9 @@ public class BookingHistoryFragment extends Fragment {
         });
     }
     
-    private void navigateToBookingDetail(int bookingId) {
-        // Intent intent = new Intent(getContext(), BookingDetailActivity.class);
-        // intent.putExtra("BOOKING_ID", bookingId);
-        // startActivity(intent);
-        Toast.makeText(getContext(), "Booking ID: " + bookingId, Toast.LENGTH_SHORT).show();
+    private void navigateToBookingDetail(BookingListResponse booking) {
+        Intent intent = new Intent(getActivity(), com.example.cinemabookingsystemfe.ui.booking.BookingDetailActivity.class);
+        intent.putExtra(com.example.cinemabookingsystemfe.ui.booking.BookingDetailActivity.EXTRA_BOOKING_DATA, booking);
+        startActivity(intent);
     }
 }

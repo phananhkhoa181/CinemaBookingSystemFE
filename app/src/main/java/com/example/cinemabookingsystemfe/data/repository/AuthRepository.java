@@ -88,6 +88,7 @@ public class AuthRepository {
                         prefsManager.saveUserId(loginResponse.getUserId());
                         prefsManager.saveUserName(loginResponse.getFullname());
                         prefsManager.saveUserEmail(loginResponse.getEmail());
+                        prefsManager.setLoggedIn(true); // Set logged in status
                         
                         android.util.Log.d("AuthRepository", "Login successful, tokens saved for: " + loginResponse.getEmail());
                         

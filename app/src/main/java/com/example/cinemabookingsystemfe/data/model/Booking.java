@@ -10,6 +10,10 @@ public class Booking {
     private String showtimeDate;
     private String showtimeTime;
     private String cinemaName;
+    private String cinemaAddress;
+    private String format; // "2D", "3D", "IMAX"
+    private String languageType; // "Phụ đề", "Lồng tiếng"
+    private String ageRating; // "C18", "P", "T13", "T16"
     private String seats;
     private double totalPrice;
     private String status; // "Pending", "Confirmed", "Completed", "Cancelled"
@@ -115,6 +119,38 @@ public class Booking {
         this.status = status;
     }
     
+    public String getCinemaAddress() {
+        return cinemaAddress;
+    }
+    
+    public void setCinemaAddress(String cinemaAddress) {
+        this.cinemaAddress = cinemaAddress;
+    }
+    
+    public String getFormat() {
+        return format;
+    }
+    
+    public void setFormat(String format) {
+        this.format = format;
+    }
+    
+    public String getLanguageType() {
+        return languageType;
+    }
+    
+    public void setLanguageType(String languageType) {
+        this.languageType = languageType;
+    }
+    
+    public String getAgeRating() {
+        return ageRating;
+    }
+    
+    public void setAgeRating(String ageRating) {
+        this.ageRating = ageRating;
+    }
+    
     // Helper methods
     public String getShowtimeFormatted() {
         return showtimeTime + " - " + showtimeDate;
@@ -126,5 +162,12 @@ public class Booking {
     
     public String getTotalPriceFormatted() {
         return String.format("%,.0f đ", totalPrice);
+    }
+    
+    public String getFormatDisplay() {
+        if (format != null && languageType != null) {
+            return format + " - " + (languageType.equals("Phụ đề") ? "SUB" : "DUB");
+        }
+        return format != null ? format : "";
     }
 }

@@ -84,7 +84,6 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
     static class CinemaViewHolder extends RecyclerView.ViewHolder {
         
         private TextView tvCinemaName;
-        private TextView tvDistance;
         private TextView tvCinemaFormat;
         private ChipGroup chipGroupShowtimes;
         private ImageView ivExpandCollapse;
@@ -92,7 +91,6 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
         public CinemaViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCinemaName = itemView.findViewById(R.id.tvCinemaName);
-            tvDistance = itemView.findViewById(R.id.tvDistance);
             tvCinemaFormat = itemView.findViewById(R.id.tvCinemaFormat);
             chipGroupShowtimes = itemView.findViewById(R.id.chipGroupShowtimes);
             ivExpandCollapse = itemView.findViewById(R.id.ivExpandCollapse);
@@ -100,7 +98,7 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
         
         public void bind(Cinema cinema, OnShowtimeClickListener listener, boolean isExpanded, int position, OnExpandClickListener expandListener) {
             tvCinemaName.setText(cinema.getName());
-            tvDistance.setText(String.format("%.1f km", cinema.getDistance()));
+            // Distance removed - API không cung cấp
             
             // Click listener for expansion
             itemView.setOnClickListener(v -> {

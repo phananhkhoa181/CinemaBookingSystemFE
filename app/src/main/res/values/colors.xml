@@ -18,6 +18,8 @@
     <color name="backgroundInput">#2F2F2F</color>
     <color name="backgroundSecondary">#1E1E1E</color>
     <color name="cardBackground">#2C2C2C</color>
+    <color name="surface">#1F1F1F</color>
+    <color name="surfaceVariant">#2C2C2C</color>
     
     <!-- Text Colors -->
     <color name="textPrimary">#FFFFFF</color>
@@ -59,6 +61,7 @@
     <!-- Additional UI Colors -->
     <color name="overlay">#80000000</color>
     <color name="error">#F44336</color>
+    <color name="errorColor">#F44336</color>
     <color name="success">#4CAF50</color>
     <color name="orange">#FF9800</color>
     

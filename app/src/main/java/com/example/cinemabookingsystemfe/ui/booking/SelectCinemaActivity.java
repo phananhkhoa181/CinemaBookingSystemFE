@@ -7,6 +7,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,8 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.adapters.SpinnerAdapter;
-import com.example.cinemabookingsystemfe.data.models.response.Cinema;
-import com.example.cinemabookingsystemfe.data.models.response.Showtime;
+import com.example.cinemabookingsystemfe.data.models.response.*;
+import com.example.cinemabookingsystemfe.data.repository.MovieRepository;
+import com.example.cinemabookingsystemfe.data.api.ApiCallback;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -26,6 +29,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * SelectCinemaActivity - Chọn rạp chiếu và suất chiếu cho phim
@@ -41,11 +46,21 @@ public class SelectCinemaActivity extends AppCompatActivity {
     private ChipGroup chipGroupDates;
     private TextView tvSelectedDate;
     private RecyclerView rvCinemas;
+    private ProgressBar progressBar;
+    private View layoutEmptyState;
 
     private int movieId;
+    private String movieTitle;
+    private String movieAgeRating;
+    private String moviePosterUrl;
     private String selectedDate;
-    private CinemaAdapter adapter;
-    private List<Cinema> allCinemas;
+    private String initialApiDate; // Store initial date to load after API returns
+    private SelectCinemaAdapter adapter;
+    
+    private MovieRepository movieRepository;
+    private MovieShowtimesResponse showtimesData;
+    private List<ShowtimesByDate.ShowtimesByCinema> allCinemas = new ArrayList<>();
+    private Map<String, List<ShowtimesByDate.ShowtimesByCinema>> showtimesByDateMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +70,19 @@ public class SelectCinemaActivity extends AppCompatActivity {
             android.util.Log.d("SelectCinema", "onCreate started");
             setContentView(R.layout.activity_select_cinema);
             
-            movieId = getIntent().getIntExtra(EXTRA_MOVIE_ID, 0);
-            android.util.Log.d("SelectCinema", "Movie ID: " + movieId);
+            // Get movie info from intent
+            movieId = getIntent().getIntExtra("movie_id", 0);
+            movieTitle = getIntent().getStringExtra("movie_title");
+            movieAgeRating = getIntent().getStringExtra("movie_age_rating");
+            moviePosterUrl = getIntent().getStringExtra("movie_poster");
+            
+            if (movieTitle == null) movieTitle = "Phim";
+            if (movieAgeRating == null) movieAgeRating = "P";
+            
+            android.util.Log.d("SelectCinema", "Movie ID: " + movieId + ", Title: " + movieTitle + ", Rating: " + movieAgeRating);
+            
+            // Initialize repository
+            movieRepository = MovieRepository.getInstance(this);
             
             initViews();
             android.util.Log.d("SelectCinema", "Views initialized");
@@ -73,8 +99,8 @@ public class SelectCinemaActivity extends AppCompatActivity {
             setupRecyclerView();
             android.util.Log.d("SelectCinema", "RecyclerView setup complete");
             
-            loadMockData();
-            android.util.Log.d("SelectCinema", "Mock data loaded successfully");
+            // Load showtimes from API
+            loadShowtimesFromAPI();
             
         } catch (Exception e) {
             android.util.Log.e("SelectCinema", "ERROR in onCreate: " + e.getMessage(), e);
@@ -93,12 +119,25 @@ public class SelectCinemaActivity extends AppCompatActivity {
         chipGroupDates = findViewById(R.id.chipGroupDates);
         tvSelectedDate = findViewById(R.id.tvSelectedDate);
         rvCinemas = findViewById(R.id.rvCinemas);
+        progressBar = findViewById(R.id.progressBar);
+        layoutEmptyState = findViewById(R.id.layoutEmptyState);
+        
+        if (progressBar != null) {
+            progressBar.setVisibility(View.GONE);
+        }
+        if (layoutEmptyState != null) {
+            layoutEmptyState.setVisibility(View.GONE);
+        }
     }
     
     private void setupToolbar() {
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            // Set movie title as toolbar title
+            if (movieTitle != null && !movieTitle.isEmpty()) {
+                getSupportActionBar().setTitle(movieTitle);
+            }
         }
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
@@ -111,34 +150,27 @@ public class SelectCinemaActivity extends AppCompatActivity {
             spinnerCity.setAdapter(cityAdapter);
             android.util.Log.d("SelectCinema", "City spinner setup OK");
         
-        // Cinema branch spinner (Movie88 chi nhánh)
-        List<String> cinemaBranches = Arrays.asList(
-            "Movie88 - Tất cả chi nhánh",
-            "Movie88 - Quận 1", 
-            "Movie88 - Quận 2",
-            "Movie88 - Quận 3",
-            "Movie88 - Quận 4",
-            "Movie88 - Thủ Đức",
-            "Movie88 - Gò Vấp"
-        );
-            SpinnerAdapter cinemaAdapter = new SpinnerAdapter(this, cinemaBranches);
-            spinnerCinema.setAdapter(cinemaAdapter);
-            android.util.Log.d("SelectCinema", "Cinema spinner setup OK");
-            
-            // Add listener to filter cinemas by branch
-            spinnerCinema.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    try {
-                        filterCinemasByBranch(position);
-                    } catch (Exception e) {
-                        android.util.Log.e("SelectCinema", "Error in filter: " + e.getMessage(), e);
-                    }
+        // Cinema spinner will be populated after API call
+        // Initially show "Tất cả chi nhánh"
+        List<String> initialCinemas = Arrays.asList("Tất cả chi nhánh");
+        SpinnerAdapter cinemaAdapter = new SpinnerAdapter(this, initialCinemas);
+        spinnerCinema.setAdapter(cinemaAdapter);
+        android.util.Log.d("SelectCinema", "Cinema spinner setup OK");
+        
+        // Add listener to filter cinemas by selected cinema
+        spinnerCinema.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                try {
+                    filterShowtimesByCinema(position);
+                } catch (Exception e) {
+                    android.util.Log.e("SelectCinema", "Error in filter: " + e.getMessage(), e);
                 }
-                
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
-            });
+            }
+            
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
             
         } catch (Exception e) {
             android.util.Log.e("SelectCinema", "Error in setupSpinners: " + e.getMessage(), e);
@@ -146,30 +178,146 @@ public class SelectCinemaActivity extends AppCompatActivity {
         }
     }
     
-    private void filterCinemasByBranch(int branchIndex) {
-        if (allCinemas == null) return;
+    /**
+     * Load showtimes from API for the selected movie
+     */
+    private void loadShowtimesFromAPI() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         
-        List<Cinema> filtered = new ArrayList<>();
-        if (branchIndex == 0) {
-            // Tất cả chi nhánh
+        movieRepository.getMovieShowtimes(movieId, null, null, new ApiCallback<ApiResponse<MovieShowtimesResponse>>() {
+            @Override
+            public void onSuccess(ApiResponse<MovieShowtimesResponse> response) {
+                runOnUiThread(() -> {
+                    if (progressBar != null) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                    
+                    if (response != null && response.getData() != null) {
+                        showtimesData = response.getData();
+                        processShowtimesData();
+                        showContent();
+                    } else {
+                        showEmptyState();
+                    }
+                });
+            }
+            
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    if (progressBar != null) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                    
+                    // Log for debugging only
+                    android.util.Log.d("SelectCinema", "Showtimes not available: " + error);
+                    
+                    // Always show empty state, no toast
+                    showEmptyState();
+                });
+            }
+        });
+    }
+    
+    /**
+     * Process showtimes data from API and populate UI
+     */
+    private void processShowtimesData() {
+        if (showtimesData == null || showtimesData.getShowtimesByDate() == null) {
+            return;
+        }
+        
+        // Group showtimes by date
+        showtimesByDateMap.clear();
+        allCinemas.clear();
+        List<String> cinemaNames = new ArrayList<>();
+        cinemaNames.add("Tất cả chi nhánh");
+        
+        for (ShowtimesByDate dateGroup : showtimesData.getShowtimesByDate()) {
+            String date = dateGroup.getDate();
+            List<ShowtimesByDate.ShowtimesByCinema> cinemas = dateGroup.getCinemas();
+            
+            showtimesByDateMap.put(date, cinemas);
+            
+            // Collect unique cinema names for spinner
+            for (ShowtimesByDate.ShowtimesByCinema cinema : cinemas) {
+                if (!cinemaNames.contains(cinema.getName())) {
+                    cinemaNames.add(cinema.getName());
+                }
+            }
+        }
+        
+        // Update cinema spinner with real data
+        SpinnerAdapter cinemaAdapter = new SpinnerAdapter(this, cinemaNames);
+        spinnerCinema.setAdapter(cinemaAdapter);
+        
+        // Load showtimes for initially selected date (today)
+        if (initialApiDate != null) {
+            updateShowtimesForDate(initialApiDate);
+        }
+    }
+    
+    /**
+     * Update showtimes display for a specific date
+     */
+    private void updateShowtimesForDate(String date) {
+        android.util.Log.d("SelectCinema", "Updating showtimes for date: " + date);
+        
+        List<ShowtimesByDate.ShowtimesByCinema> cinemas = showtimesByDateMap.get(date);
+        
+        if (cinemas != null && !cinemas.isEmpty()) {
+            // Date has showtimes - show them
+            allCinemas.clear();
+            allCinemas.addAll(cinemas);
+            
+            // Apply cinema filter if any cinema is selected
+            int selectedCinemaIndex = spinnerCinema.getSelectedItemPosition();
+            filterShowtimesByCinema(selectedCinemaIndex);
+            
+            showContent();
+        } else {
+            // Date has no showtimes - show empty state
+            android.util.Log.d("SelectCinema", "No showtimes for date: " + date);
+            allCinemas.clear();
+            adapter.updateData(new ArrayList<>());
+            showEmptyState();
+        }
+    }
+    
+    /**
+     * Filter showtimes by selected cinema from spinner
+     */
+    private void filterShowtimesByCinema(int cinemaIndex) {
+        if (allCinemas == null || allCinemas.isEmpty()) {
+            return;
+        }
+        
+        List<ShowtimesByDate.ShowtimesByCinema> filtered = new ArrayList<>();
+        
+        if (cinemaIndex == 0) {
+            // "Tất cả chi nhánh" - show all
             filtered.addAll(allCinemas);
         } else {
-            // Filter by district
-            String[] districts = {"Quận 1", "Quận 2", "Quận 3", "Quận 4", "Thủ Đức", "Gò Vấp"};
-            String selectedDistrict = districts[branchIndex - 1];
-            for (Cinema cinema : allCinemas) {
-                if (cinema.getDistrict().contains(selectedDistrict)) {
+            // Get selected cinema name
+            String selectedCinemaName = (String) spinnerCinema.getItemAtPosition(cinemaIndex);
+            
+            // Filter by cinema name
+            for (ShowtimesByDate.ShowtimesByCinema cinema : allCinemas) {
+                if (cinema.getName().equals(selectedCinemaName)) {
                     filtered.add(cinema);
                 }
             }
         }
+        
         adapter.updateData(filtered);
     }
     
     private void setupDateChips() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd / MM", Locale.getDefault());
-        SimpleDateFormat dayNameFormat = new SimpleDateFormat("EEEE", new Locale("vi", "VN"));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM", Locale.getDefault());
         SimpleDateFormat fullDateFormat = new SimpleDateFormat("EEEE dd, 'tháng' MM yyyy", new Locale("vi", "VN"));
+        SimpleDateFormat apiDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
         
         // Generate next 4 days
@@ -177,194 +325,132 @@ public class SelectCinemaActivity extends AppCompatActivity {
             final Calendar chipCalendar = (Calendar) calendar.clone();
             final String chipDate = dateFormat.format(chipCalendar.getTime());
             final String fullDate = fullDateFormat.format(chipCalendar.getTime());
+            final String apiDate = apiDateFormat.format(chipCalendar.getTime()); // For API matching
             
-            Chip chip = new Chip(this);
+            // Inflate custom date item layout
+            View dateView = getLayoutInflater().inflate(R.layout.item_date_chip, chipGroupDates, false);
+            com.google.android.material.card.MaterialCardView cardDate = dateView.findViewById(R.id.cardDate);
+            TextView tvDayName = dateView.findViewById(R.id.tvDayName);
+            TextView tvDate = dateView.findViewById(R.id.tvDate);
             
-            // Real-time day name
-            String dayText;
+            // Set day name
+            String dayName;
             if (i == 0) {
-                dayText = "Hôm nay\n" + chipDate;
-            } else if (i == 1) {
-                dayText = dayNameFormat.format(chipCalendar.getTime()) + "\n" + chipDate;
+                dayName = "Hôm nay";
             } else {
-                dayText = dayNameFormat.format(chipCalendar.getTime()) + "\n" + chipDate;
+                dayName = new SimpleDateFormat("EEEE", new Locale("vi", "VN")).format(chipCalendar.getTime());
             }
+            tvDayName.setText(dayName);
+            tvDate.setText(chipDate);
             
-            chip.setText(dayText);
-            chip.setCheckable(true);
-            chip.setChipBackgroundColorResource(R.color.white);
-            chip.setTextColor(getColor(R.color.black));
-            chip.setChipStrokeWidth(2);
-            chip.setChipStrokeColorResource(R.color.border);
-            chip.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-            
-            // BỎ dấu tick
-            chip.setCheckedIconVisible(false);
-            
-            // Fixed chip size - không thay đổi khi select
-            chip.setChipMinHeight(60);
-            chip.setMinWidth(100);
-            chip.setTextSize(12);
-            
-            if (i == 0) {
-                chip.setChecked(true);
-                chip.setChipBackgroundColor(getColorStateList(android.R.color.holo_blue_dark));
-                chip.setTextColor(getColor(R.color.white));
+            // Set initial state
+            final boolean isFirst = (i == 0);
+            if (isFirst) {
+                cardDate.setCardBackgroundColor(getColor(android.R.color.holo_blue_dark));
+                tvDayName.setTextColor(getColor(R.color.white));
+                tvDate.setTextColor(getColor(R.color.white));
                 selectedDate = chipDate;
                 tvSelectedDate.setText(fullDate);
+                initialApiDate = apiDate; // Save for loading after API returns
             }
             
-            chip.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    // Chỉ đổi màu, không thay đổi size
-                    chip.setChipBackgroundColor(getColorStateList(android.R.color.holo_blue_dark));
-                    chip.setTextColor(getColor(R.color.white));
-                    selectedDate = chipDate;
-                    tvSelectedDate.setText(fullDate);
+            // Click listener
+            dateView.setOnClickListener(v -> {
+                // Reset all other date items
+                for (int j = 0; j < chipGroupDates.getChildCount(); j++) {
+                    View child = chipGroupDates.getChildAt(j);
+                    com.google.android.material.card.MaterialCardView card = child.findViewById(R.id.cardDate);
+                    TextView dayNameView = child.findViewById(R.id.tvDayName);
+                    TextView dateTextView = child.findViewById(R.id.tvDate);
                     
-                    // Filter showtimes by selected date
-                    filterShowtimesByDate(chipCalendar);
-                } else {
-                    chip.setChipBackgroundColorResource(R.color.white);
-                    chip.setTextColor(getColor(R.color.black));
+                    card.setCardBackgroundColor(getColor(R.color.white));
+                    dayNameView.setTextColor(getColor(R.color.black));
+                    dateTextView.setTextColor(getColor(R.color.black));
                 }
+                
+                // Set selected state
+                cardDate.setCardBackgroundColor(getColor(android.R.color.holo_blue_dark));
+                tvDayName.setTextColor(getColor(R.color.white));
+                tvDate.setTextColor(getColor(R.color.white));
+                selectedDate = chipDate;
+                tvSelectedDate.setText(fullDate);
+                
+                // Filter showtimes by selected date using API format
+                updateShowtimesForDate(apiDate);
             });
             
-            chipGroupDates.addView(chip);
+            chipGroupDates.addView(dateView);
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
     }
     
     private void setupRecyclerView() {
-        adapter = new CinemaAdapter(allCinemas, (showtime, cinema) -> onShowtimeClick(showtime, cinema));
+        adapter = new SelectCinemaAdapter(allCinemas, this::onShowtimeClick);
         rvCinemas.setLayoutManager(new LinearLayoutManager(this));
         rvCinemas.setAdapter(adapter);
     }
     
-    private void loadMockData() {
-        allCinemas = new ArrayList<>();
+    /**
+     * Handle showtime item click
+     */
+    private void onShowtimeClick(ShowtimesByDate.ShowtimeItem showtime, ShowtimesByDate.ShowtimesByCinema cinema) {
+        // Check if user is logged in before proceeding to seat selection
+        com.example.cinemabookingsystemfe.utils.TokenManager tokenManager = 
+            com.example.cinemabookingsystemfe.utils.TokenManager.getInstance(this);
         
-        // Mock Cinema 1 - Thủ Đức
-        Cinema cinema1 = new Cinema(1, "Movie88 Co.opXtra Linh Trung", 
-            "Số 1, Khu phố 6", "Thủ Đức", "TP Hồ Chí Minh");
-        cinema1.setDistance(6.9);
-        List<Showtime> showtimes1 = new ArrayList<>();
-        showtimes1.add(createShowtime(1, 1, "22:15", "2D PHỤ ĐỀ", 80000));
-        cinema1.setShowtimes(showtimes1);
-        allCinemas.add(cinema1);
-        
-        // Mock Cinema 2 - Quận 1 (with both 2D and 3D formats)
-        Cinema cinema2 = new Cinema(2, "Movie88 Nguyễn Du",
-            "116 Nguyễn Du", "Quận 1", "TP Hồ Chí Minh");
-        cinema2.setDistance(16.6);
-        List<Showtime> showtimes2 = new ArrayList<>();
-        showtimes2.add(createShowtime(2, 2, "14:30", "2D PHỤ ĐỀ", 75000));
-        showtimes2.add(createShowtime(3, 2, "18:45", "2D PHỤ ĐỀ", 85000));
-        showtimes2.add(createShowtime(7, 2, "16:00", "3D PHỤ ĐỀ", 95000));
-        showtimes2.add(createShowtime(8, 2, "20:30", "3D PHỤ ĐỀ", 105000));
-        cinema2.setShowtimes(showtimes2);
-        allCinemas.add(cinema2);
-        
-        // Mock Cinema 3 - Gò Vấp
-        Cinema cinema3 = new Cinema(3, "Movie88 Quang Trung",
-            "Ngã tư Quang Trung - Trường Chinh", "Gò Vấp", "TP Hồ Chí Minh");
-        cinema3.setDistance(18.3);
-        List<Showtime> showtimes3 = new ArrayList<>();
-        showtimes3.add(createShowtime(4, 3, "16:00", "2D PHỤ ĐỀ", 70000));
-        cinema3.setShowtimes(showtimes3);
-        allCinemas.add(cinema3);
-        
-        // Mock Cinema 4 - Quận 2
-        Cinema cinema4 = new Cinema(4, "Movie88 Thảo Điền",
-            "253 Nguyễn Văn Hưởng", "Quận 2", "TP Hồ Chí Minh");
-        cinema4.setDistance(12.5);
-        List<Showtime> showtimes4 = new ArrayList<>();
-        showtimes4.add(createShowtime(5, 4, "15:00", "2D PHỤ ĐỀ", 75000));
-        showtimes4.add(createShowtime(6, 4, "20:30", "2D PHỤ ĐỀ", 85000));
-        cinema4.setShowtimes(showtimes4);
-        allCinemas.add(cinema4);
-        
-        adapter.updateData(allCinemas);
-    }
-    
-    private Showtime createShowtime(int id, int cinemaId, String time, String format, double price) {
-        Showtime showtime = new Showtime();
-        showtime.setShowtimeId(id);
-        showtime.setCinemaId(cinemaId);
-        showtime.setTime(time);
-        showtime.setFormat(format);
-        showtime.setPrice(price);
-        showtime.setAvailableSeats(50);
-        return showtime;
-    }
-    
-    private void filterShowtimesByDate(Calendar selectedCalendar) {
-        // Get day of week (0 = Sunday, 1 = Monday, etc.)
-        int dayOfWeek = selectedCalendar.get(Calendar.DAY_OF_WEEK);
-        
-        // Update showtimes based on selected date
-        for (Cinema cinema : allCinemas) {
-            List<Showtime> newShowtimes = new ArrayList<>();
-            
-            // Generate different showtimes for different days
-            if (cinema.getCinemaId() == 1) { // Movie88 Thủ Đức
-                if (dayOfWeek == Calendar.SUNDAY) {
-                    newShowtimes.add(createShowtime(1, 1, "10:00", "2D PHỤ ĐỀ", 60000));
-                    newShowtimes.add(createShowtime(101, 1, "22:15", "2D PHỤ ĐỀ", 80000));
-                } else {
-                    newShowtimes.add(createShowtime(1, 1, "22:15", "2D PHỤ ĐỀ", 80000));
-                }
-            } else if (cinema.getCinemaId() == 2) { // Movie88 Nguyễn Du
-                if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
-                    newShowtimes.add(createShowtime(2, 2, "10:30", "2D PHỤ ĐỀ", 70000));
-                    newShowtimes.add(createShowtime(3, 2, "14:30", "2D PHỤ ĐỀ", 75000));
-                    newShowtimes.add(createShowtime(102, 2, "18:45", "2D PHỤ ĐỀ", 85000));
-                    newShowtimes.add(createShowtime(7, 2, "13:00", "3D PHỤ ĐỀ", 95000));
-                    newShowtimes.add(createShowtime(8, 2, "16:00", "3D PHỤ ĐỀ", 95000));
-                    newShowtimes.add(createShowtime(103, 2, "20:30", "3D PHỤ ĐỀ", 105000));
-                } else {
-                    newShowtimes.add(createShowtime(2, 2, "14:30", "2D PHỤ ĐỀ", 75000));
-                    newShowtimes.add(createShowtime(3, 2, "18:45", "2D PHỤ ĐỀ", 85000));
-                    newShowtimes.add(createShowtime(7, 2, "16:00", "3D PHỤ ĐỀ", 95000));
-                    newShowtimes.add(createShowtime(8, 2, "20:30", "3D PHỤ ĐỀ", 105000));
-                }
-            } else if (cinema.getCinemaId() == 3) { // Movie88 Quang Trung
-                if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
-                    newShowtimes.add(createShowtime(4, 3, "11:00", "2D PHỤ ĐỀ", 65000));
-                    newShowtimes.add(createShowtime(104, 3, "16:00", "2D PHỤ ĐỀ", 70000));
-                    newShowtimes.add(createShowtime(105, 3, "21:00", "2D PHỤ ĐỀ", 75000));
-                } else {
-                    newShowtimes.add(createShowtime(4, 3, "16:00", "2D PHỤ ĐỀ", 70000));
-                }
-            } else if (cinema.getCinemaId() == 4) { // Movie88 Thảo Điền
-                newShowtimes.add(createShowtime(5, 4, "15:00", "2D PHỤ ĐỀ", 75000));
-                newShowtimes.add(createShowtime(6, 4, "20:30", "2D PHỤ ĐỀ", 85000));
-                if (dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY) {
-                    newShowtimes.add(createShowtime(106, 4, "10:00", "2D PHỤ ĐỀ", 65000));
-                }
-            }
-            
-            cinema.setShowtimes(newShowtimes);
+        String token = tokenManager.getToken();
+        if (token == null || token.isEmpty() || tokenManager.isTokenExpired()) {
+            // User not logged in -> redirect to LoginActivity
+            Toast.makeText(this, "Vui lòng đăng nhập để đặt vé", Toast.LENGTH_SHORT).show();
+            Intent loginIntent = new Intent(this, 
+                    com.example.cinemabookingsystemfe.ui.auth.LoginActivity.class);
+            startActivity(loginIntent);
+            return;
         }
         
-        // Re-filter by selected branch
-        int currentBranchIndex = spinnerCinema.getSelectedItemPosition();
-        filterCinemasByBranch(currentBranchIndex);
-    }
-    
-    private void onShowtimeClick(Showtime showtime, Cinema cinema) {
+        // User is logged in -> proceed to seat selection
         Intent intent = new Intent(this, SelectSeatActivity.class);
         intent.putExtra(SelectSeatActivity.EXTRA_SHOWTIME_ID, showtime.getShowtimeId());
-        intent.putExtra(SelectSeatActivity.EXTRA_MOVIE_TITLE, "Phá Đám: Sinh Nhật Mẹ"); // TODO: Get from movieId
+        
+        // ✅ Use real auditoriumId from API response (Backend now returns this field)
+        intent.putExtra(SelectSeatActivity.EXTRA_AUDITORIUM_ID, showtime.getAuditoriumId());
+        
+        intent.putExtra(SelectSeatActivity.EXTRA_SHOWTIME_PRICE, showtime.getPrice());
+        intent.putExtra(SelectSeatActivity.EXTRA_MOVIE_TITLE, movieTitle);
         intent.putExtra(SelectSeatActivity.EXTRA_CINEMA_NAME, cinema.getName());
-        intent.putExtra(SelectSeatActivity.EXTRA_SHOWTIME_FORMAT, showtime.getFormat());
-        intent.putExtra(SelectSeatActivity.EXTRA_SHOWTIME_TIME, showtime.getTime());
-        intent.putExtra(SelectSeatActivity.EXTRA_MOVIE_RATING, "C13"); // TODO: Get from movie API
+        intent.putExtra(SelectSeatActivity.EXTRA_SHOWTIME_FORMAT, showtime.getFormat() + " " + showtime.getLanguageType());
+        intent.putExtra(SelectSeatActivity.EXTRA_SHOWTIME_TIME, showtime.getStartTime());
+        intent.putExtra(SelectSeatActivity.EXTRA_MOVIE_RATING, movieAgeRating);
+        intent.putExtra(SelectSeatActivity.EXTRA_MOVIE_POSTER, moviePosterUrl);
         
         // Get selected date from chip
         String selectedDateStr = tvSelectedDate.getText().toString();
         intent.putExtra(SelectSeatActivity.EXTRA_SHOWTIME_DATE, selectedDateStr);
         
         startActivity(intent);
+    }
+    
+    /**
+     * Show empty state when no showtimes available
+     */
+    private void showEmptyState() {
+        if (layoutEmptyState != null) {
+            layoutEmptyState.setVisibility(View.VISIBLE);
+        }
+        if (rvCinemas != null) {
+            rvCinemas.setVisibility(View.GONE);
+        }
+    }
+    
+    /**
+     * Show content when showtimes are available
+     */
+    private void showContent() {
+        if (layoutEmptyState != null) {
+            layoutEmptyState.setVisibility(View.GONE);
+        }
+        if (rvCinemas != null) {
+            rvCinemas.setVisibility(View.VISIBLE);
+        }
     }
 }

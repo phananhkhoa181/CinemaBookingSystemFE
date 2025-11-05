@@ -50,6 +50,19 @@ public class ComboAdapter extends RecyclerView.Adapter<ComboAdapter.ComboViewHol
         notifyDataSetChanged(); // Refresh all items to update UI
     }
 
+    public Combo getComboById(int comboId) {
+        for (Combo combo : combos) {
+            if (combo.getComboId() == comboId) {
+                return combo;
+            }
+        }
+        return null;
+    }
+
+    public List<Combo> getAllCombos() {
+        return new ArrayList<>(combos);
+    }
+
     @NonNull
     @Override
     public ComboViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

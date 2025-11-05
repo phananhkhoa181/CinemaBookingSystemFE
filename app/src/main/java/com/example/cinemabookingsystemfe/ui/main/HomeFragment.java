@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.cinemabookingsystemfe.R;
-import com.example.cinemabookingsystemfe.data.model.Movie;
+import com.example.cinemabookingsystemfe.data.models.response.Movie;
 import com.example.cinemabookingsystemfe.ui.adapters.PromotionAdapter;
 import com.example.cinemabookingsystemfe.ui.adapters.MovieAdapter;
 import com.google.android.material.tabs.TabLayout;
@@ -271,11 +271,10 @@ public class HomeFragment extends Fragment {
     }
     
     private void navigateToMovieDetail(Movie movie) {
-        // TODO: Create MovieDetailActivity and navigate
-        // For now, show toast with movie info
-        Toast.makeText(getContext(), 
-            "Movie: " + movie.getTitle() + "\nRating: " + movie.getRating() + "\n⭐ " + movie.getAverageRating(), 
-            Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getContext(), 
+                com.example.cinemabookingsystemfe.ui.moviedetail.MovieDetailActivity.class);
+        intent.putExtra("movieId", movie.getMovieId());
+        startActivity(intent);
     }
     
     @Override

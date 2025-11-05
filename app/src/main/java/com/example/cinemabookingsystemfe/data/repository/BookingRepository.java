@@ -1,73 +1,144 @@
 package com.example.cinemabookingsystemfe.data.repository;
 
-import com.example.cinemabookingsystemfe.data.model.Booking;
-import com.example.cinemabookingsystemfe.network.ApiCallback;
+import android.content.Context;
+import android.util.Log;
 
-import java.util.ArrayList;
+import com.example.cinemabookingsystemfe.data.api.ApiCallback;
+import com.example.cinemabookingsystemfe.data.api.ApiClient;
+import com.example.cinemabookingsystemfe.data.api.ApiService;
+import com.example.cinemabookingsystemfe.data.models.response.ApiResponse;
+import com.example.cinemabookingsystemfe.data.models.response.BookingDetail;
+import com.example.cinemabookingsystemfe.data.models.response.BookingListResponse;
+import com.example.cinemabookingsystemfe.data.models.response.PaginatedBookingResponse;
+import com.example.cinemabookingsystemfe.utils.TokenManager;
+
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class BookingRepository {
+    private static final String TAG = "BookingRepository";
     private static BookingRepository instance;
+    private final ApiService apiService;
+    private final TokenManager tokenManager;
     
-    private BookingRepository() {
+    private BookingRepository(Context context) {
+        this.apiService = ApiClient.getInstance(context).getApiService();
+        this.tokenManager = TokenManager.getInstance(context);
     }
     
-    public static synchronized BookingRepository getInstance() {
+    public static synchronized BookingRepository getInstance(Context context) {
         if (instance == null) {
-            instance = new BookingRepository();
+            instance = new BookingRepository(context.getApplicationContext());
         }
         return instance;
     }
     
-    public void getMyBookings(String status, ApiCallback<List<Booking>> callback) {
-        // Mock data for testing
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000); // Simulate network delay
-                
-                List<Booking> bookings = generateMockBookings(status);
-                
-                // Callback on main thread would be needed in real implementation
-                callback.onSuccess(bookings);
-            } catch (Exception e) {
-                callback.onError("Lỗi khi tải lịch sử đặt vé: " + e.getMessage());
+    /**
+     * Get my bookings with pagination and optional status filter
+     * @param page Page number (1-based)
+     * @param pageSize Number of items per page
+     * @param status Filter by status: "Pending", "Confirmed", "Cancelled", "Completed", or null for all
+     * @param callback Callback with list of bookings
+     */
+    public void getMyBookings(Integer page, Integer pageSize, String status, 
+                              ApiCallback<ApiResponse<PaginatedBookingResponse>> callback) {
+        // Check token using TokenManager
+        String token = tokenManager.getToken();
+        if (token == null || token.isEmpty()) {
+            callback.onError("Vui lòng đăng nhập lại");
+            return;
+        }
+        
+        Log.d(TAG, "Getting my bookings - page: " + page + ", pageSize: " + pageSize + ", status: " + status);
+        
+        // Use the apiService that already has AuthInterceptor configured
+        Call<ApiResponse<PaginatedBookingResponse>> call = apiService.getMyBookings(page, pageSize, status);
+        
+        call.enqueue(new Callback<ApiResponse<PaginatedBookingResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<PaginatedBookingResponse>> call, 
+                                 Response<ApiResponse<PaginatedBookingResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<PaginatedBookingResponse> apiResponse = response.body();
+                    if (apiResponse.isSuccess()) {
+                        Log.d(TAG, "Bookings loaded successfully");
+                        callback.onSuccess(apiResponse);
+                    } else {
+                        Log.e(TAG, "API error: " + apiResponse.getMessage());
+                        callback.onError(apiResponse.getMessage());
+                    }
+                } else {
+                    String errorMsg = "Lỗi tải danh sách đặt vé";
+                    if (response.code() == 401) {
+                        errorMsg = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại";
+                    } else if (response.code() == 403) {
+                        errorMsg = "Bạn không có quyền truy cập";
+                    }
+                    Log.e(TAG, "HTTP error: " + response.code() + " - " + response.message());
+                    callback.onError(errorMsg);
+                }
             }
-        }).start();
+            
+            @Override
+            public void onFailure(Call<ApiResponse<PaginatedBookingResponse>> call, Throwable t) {
+                Log.e(TAG, "Network error: " + t.getMessage(), t);
+                callback.onError("Lỗi kết nối: " + t.getMessage());
+            }
+        });
     }
     
-    private List<Booking> generateMockBookings(String status) {
-        List<Booking> bookings = new ArrayList<>();
-        
-        if ("All".equals(status) || status == null) {
-            // Generate bookings for all statuses
-            bookings.addAll(createBookingsForStatus("Pending", 2));
-            bookings.addAll(createBookingsForStatus("Confirmed", 2));
-            bookings.addAll(createBookingsForStatus("Completed", 1));
-        } else {
-            bookings.addAll(createBookingsForStatus(status, 3));
+    /**
+     * Get booking detail by ID
+     * @param bookingId Booking ID
+     * @param callback Callback with booking detail
+     */
+    public void getBookingById(int bookingId, ApiCallback<ApiResponse<BookingDetail>> callback) {
+        // Check token using TokenManager
+        String token = tokenManager.getToken();
+        if (token == null || token.isEmpty()) {
+            callback.onError("Vui lòng đăng nhập lại");
+            return;
         }
         
-        return bookings;
-    }
-    
-    private List<Booking> createBookingsForStatus(String status, int count) {
-        List<Booking> bookings = new ArrayList<>();
+        Log.d(TAG, "Getting booking detail - ID: " + bookingId);
         
-        for (int i = 1; i <= count; i++) {
-            Booking booking = new Booking();
-            booking.setBookingId(i);
-            booking.setBookingCode("BK" + System.currentTimeMillis() + i);
-            booking.setMovieTitle("Avengers: Endgame");
-            booking.setMoviePosterUrl("https://via.placeholder.com/300x450");
-            booking.setCinemaName("CGV Vincom Center");
-            booking.setShowtimeDate("29/10/2025");
-            booking.setShowtimeTime("19:30");
-            booking.setSeats("A1, A2");
-            booking.setTotalPrice(240000);
-            booking.setStatus(status);
-            bookings.add(booking);
-        }
+        Call<ApiResponse<BookingDetail>> call = apiService.getBookingById(bookingId);
         
-        return bookings;
+        call.enqueue(new Callback<ApiResponse<BookingDetail>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<BookingDetail>> call, 
+                                 Response<ApiResponse<BookingDetail>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<BookingDetail> apiResponse = response.body();
+                    if (apiResponse.isSuccess()) {
+                        Log.d(TAG, "Booking detail loaded successfully");
+                        callback.onSuccess(apiResponse);
+                    } else {
+                        Log.e(TAG, "API error: " + apiResponse.getMessage());
+                        callback.onError(apiResponse.getMessage());
+                    }
+                } else {
+                    String errorMsg = "Lỗi tải thông tin đặt vé";
+                    if (response.code() == 401) {
+                        errorMsg = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại";
+                    } else if (response.code() == 403) {
+                        errorMsg = "Bạn không có quyền truy cập";
+                    } else if (response.code() == 404) {
+                        errorMsg = "Không tìm thấy thông tin đặt vé";
+                    }
+                    Log.e(TAG, "HTTP error: " + response.code() + " - " + response.message());
+                    callback.onError(errorMsg);
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiResponse<BookingDetail>> call, Throwable t) {
+                Log.e(TAG, "Network error: " + t.getMessage(), t);
+                callback.onError("Lỗi kết nối: " + t.getMessage());
+            }
+        });
     }
 }

@@ -19,15 +19,9 @@
         android:theme="@style/Theme.CinemaBookingSystemFE"
         android:usesCleartextTraffic="true">
         
-        <!-- Splash Activity (LAUNCHER) -->
+        <!-- Splash Activity (LAUNCHER) - First screen -->
         <activity
             android:name=".ui.auth.SplashActivity"
-            android:exported="false"
-            android:theme="@style/Theme.CinemaBookingSystemFE" />
-        
-        <!-- Login Activity - First screen -->
-        <activity
-            android:name=".ui.auth.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.CinemaBookingSystemFE">
             <intent-filter>
@@ -35,6 +29,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- Login Activity - Show when user needs to login -->
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
         
         <!-- Main Activity - After login -->
         <activity
@@ -79,11 +79,38 @@
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
+        <activity
+            android:name=".ui.booking.BookingDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
         <!-- Payment Activities -->
         <activity
             android:name=".ui.payment.BookingSummaryActivity"
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
+        <!-- Payment Result Activity with Deep Link -->
+        <activity
+            android:name=".ui.payment.PaymentResultActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.CinemaBookingSystemFE">
+            
+            <!-- Deep Link for VNPay callback -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                
+                <!-- Deep link scheme: movieapp://payment/result -->
+                <data
+                    android:scheme="movieapp"
+                    android:host="payment"
+                    android:pathPrefix="/result" />
+            </intent-filter>
+        </activity>
         
         <!-- Movie Detail Activities -->
         <activity
@@ -91,8 +118,18 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
         
+        <activity
+            android:name=".ui.moviedetail.MovieDetailActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        
+        <activity
+            android:name=".ui.moviedetail.MovieTrailerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+        
         <!-- TODO: Thêm các Activities khác khi implement -->
-        <!-- MovieDetailActivity, ProfileEditActivity, etc. -->
+        <!-- ProfileEditActivity, etc. -->
         
     </application>
 

@@ -1,15 +1,30 @@
 package com.example.cinemabookingsystemfe.data.models.response;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Combo model - Combo bắp nước
  * Used in SelectComboActivity
+ * API: GET /api/combos
  */
 public class Combo {
+    @SerializedName("comboid")
     private int comboId;
+    
+    @SerializedName("name")
     private String name;
+    
+    @SerializedName("description")
     private String description;
+    
+    @SerializedName("price")
     private double price;
+    
+    @SerializedName("imageurl")
     private String imageUrl;
+    
+    // Note: Backend doesn't have isavailable field in entity
+    // This is for local UI state only
     private boolean isAvailable;
 
     // Constructor
