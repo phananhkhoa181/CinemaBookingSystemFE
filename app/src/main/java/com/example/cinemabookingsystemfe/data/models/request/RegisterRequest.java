@@ -1,32 +1,61 @@
 package com.example.cinemabookingsystemfe.data.models.request;
 
-public class RegisterRequest {
-    private String username;
-    private String password;
-    private String email;
-    private String fullName;
-    private String phoneNumber;
+import com.google.gson.annotations.SerializedName;
 
-    public RegisterRequest(String username, String password, String email, String fullName) {
-        this.username = username;
-        this.password = password;
+/**
+ * RegisterRequest - Matches Railway backend
+ * Backend ACTUALLY expects: fullName, email, password, confirmPassword, phoneNumber
+ * (Backend docs are incorrect - use phoneNumber not phone!)
+ */
+public class RegisterRequest {
+    
+    @SerializedName("fullName")
+    private String fullname;
+    
+    @SerializedName("email")
+    private String email;
+    
+    @SerializedName("password")
+    private String password;
+    
+    @SerializedName("confirmPassword")
+    private String confirmPassword;
+    
+    @SerializedName("phoneNumber")
+    private String phone;
+
+    public RegisterRequest(String fullname, String email, String password, String confirmPassword, String phone) {
+        this.fullname = fullname;
         this.email = email;
-        this.fullName = fullName;
+        this.password = password;
+        this.confirmPassword = confirmPassword;
+        this.phone = phone;
     }
 
     // Getters and Setters
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
+    public String getFullname() { return fullname; }
+    public void setFullname(String fullname) { this.fullname = fullname; }
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getFullName() { return fullName; }
-    public void setFullName(String fullName) { this.fullName = fullName; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
-    public String getPhoneNumber() { return phoneNumber; }
-    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getConfirmPassword() { return confirmPassword; }
+    public void setConfirmPassword(String confirmPassword) { this.confirmPassword = confirmPassword; }
+
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    
+    @Override
+    public String toString() {
+        return "RegisterRequest{" +
+                "fullname='" + fullname + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", password='" + (password != null ? "***" : "null") + '\'' +
+                ", confirmPassword='" + (confirmPassword != null ? "***" : "null") + '\'' +
+                '}';
+    }
 }

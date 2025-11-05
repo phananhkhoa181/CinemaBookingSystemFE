@@ -8,11 +8,11 @@ package com.example.cinemabookingsystemfe.utils;
 public class Constants {
     
     // API Configuration
-    public static final String BASE_URL = "https://localhost:7001/"; // TODO: Thay bằng URL thật
-    public static final String BASE_URL_PROD = "https://api.movie88.com/";
+    public static final String BASE_URL = "https://movie88aspnet-app.up.railway.app/"; // Railway production
+    public static final String BASE_URL_DEV = "https://localhost:7001/"; // Local development
     
-    // Mock Mode - Set to true to use mock data (no backend needed)
-    public static final boolean USE_MOCK_API = true; // TODO: Set to false when backend is ready
+    // Mock Mode - Set to false to use real API
+    public static final boolean USE_MOCK_API = false; // Using real Railway backend
     
     // SharedPreferences Keys
     public static final String PREFS_NAME = "CinemaBookingPrefs";

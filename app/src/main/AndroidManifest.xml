@@ -46,6 +46,16 @@
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
+        <activity
+            android:name=".ui.auth.VerifyEmailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
+        <activity
+            android:name=".ui.auth.ResetPasswordActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
         <!-- Main Activity -->
         <activity
             android:name=".ui.main.MainActivity"

@@ -59,4 +59,12 @@
     <color name="overlay">#80000000</color>
     <color name="error">#F44336</color>
     <color name="success">#4CAF50</color>
+    <color name="orange">#FF9800</color>
+    
+    <!-- Aliases for common usage -->
+    <color name="background">@color/backgroundColor</color>
+    <color name="card_background">@color/cardBackground</color>
+    <color name="text_secondary">@color/textSecondary</color>
+    <color name="text_hint">@color/textHint</color>
+    <color name="primary">@color/colorPrimary</color>
 </resources>

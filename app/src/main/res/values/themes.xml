@@ -20,4 +20,19 @@
     </style>
 
     <style name="Theme.CinemaBookingSystemFE" parent="Base.Theme.CinemaBookingSystemFE" />
+    
+    <!-- OTP EditText Style -->
+    <style name="OtpEditTextStyle" parent="Widget.MaterialComponents.TextInputEditText.OutlinedBox">
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:background">@drawable/otp_input_background</item>
+        <item name="android:textCursorDrawable">@null</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
 </resources>

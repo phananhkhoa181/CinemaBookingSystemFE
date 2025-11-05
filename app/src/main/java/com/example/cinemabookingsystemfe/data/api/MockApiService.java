@@ -23,21 +23,22 @@ public class MockApiService {
      */
     public static void login(LoginRequest request, ApiCallback<ApiResponse<LoginResponse>> callback) {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Mock success response
-            User mockUser = new User(
-                1,
-                request.getUsername(),
-                request.getUsername() + "@gmail.com",
-                "Mock User"
-            );
-            mockUser.setPhoneNumber("0123456789");
-            mockUser.setRole("Customer");
+            // NOTE: Mock disabled - using real API now
+            // Mock success response with nested user structure (matching backend format)
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setToken("mock_jwt_token_" + System.currentTimeMillis());
+            loginResponse.setRefreshToken("mock_refresh_token_" + System.currentTimeMillis());
+            loginResponse.setExpiresAt("2025-12-31T23:59:59");
             
-            LoginResponse loginResponse = new LoginResponse(
-                "mock_jwt_token_" + System.currentTimeMillis(),
-                "mock_refresh_token_" + System.currentTimeMillis(),
-                mockUser
-            );
+            // Create nested user data (matching backend format)
+            LoginResponse.UserData userData = new LoginResponse.UserData();
+            userData.setUserId(1);
+            userData.setFullName("Mock User");
+            userData.setEmail(request.getEmail());
+            userData.setPhoneNumber("0123456789");
+            userData.setRoleId(1);
+            userData.setRoleName("Customer");
+            loginResponse.setUser(userData);
             
             ApiResponse<LoginResponse> response = new ApiResponse<>();
             response.setSuccess(true);
@@ -53,16 +54,14 @@ public class MockApiService {
      */
     public static void register(RegisterRequest request, ApiCallback<ApiResponse<RegisterResponse>> callback) {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            // Auto login after register
-            User mockUser = new User(2, request.getUsername(), request.getEmail(), request.getFullName());
-            mockUser.setPhoneNumber(request.getPhoneNumber());
-            mockUser.setRole("Customer");
-            
-            RegisterResponse registerResponse = new RegisterResponse(
-                "mock_jwt_token_" + System.currentTimeMillis(),
-                "mock_refresh_token_" + System.currentTimeMillis(),
-                mockUser
-            );
+            // NOTE: Mock disabled - using real API now
+            // Mock success response with updated request fields
+            RegisterResponse registerResponse = new RegisterResponse();
+            registerResponse.setUserId(2);
+            registerResponse.setFullname(request.getFullname());
+            registerResponse.setEmail(request.getEmail());
+            registerResponse.setPhone(request.getPhone());
+            registerResponse.setRoleName("Customer");
             
             ApiResponse<RegisterResponse> response = new ApiResponse<>();
             response.setSuccess(true);
