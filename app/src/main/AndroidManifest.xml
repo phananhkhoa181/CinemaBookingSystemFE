@@ -22,6 +22,12 @@
         <!-- Splash Activity (LAUNCHER) -->
         <activity
             android:name=".ui.auth.SplashActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
+        <!-- Login Activity - First screen -->
+        <activity
+            android:name=".ui.auth.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.CinemaBookingSystemFE">
             <intent-filter>
@@ -30,12 +36,13 @@
             </intent-filter>
         </activity>
         
-        <!-- Authentication Activities -->
+        <!-- Main Activity - After login -->
         <activity
-            android:name=".ui.auth.LoginActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
+        <!-- Authentication Activities -->
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false"
@@ -53,12 +60,6 @@
         
         <activity
             android:name=".ui.auth.ResetPasswordActivity"
-            android:exported="false"
-            android:theme="@style/Theme.CinemaBookingSystemFE" />
-        
-        <!-- Main Activity -->
-        <activity
-            android:name=".ui.main.MainActivity"
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
@@ -84,12 +85,14 @@
             android:exported="false"
             android:theme="@style/Theme.CinemaBookingSystemFE" />
         
-        <!-- TODO: Other activities will be added when modules are implemented -->
-        
-
+        <!-- Movie Detail Activities -->
+        <activity
+            android:name=".ui.moviedetail.SearchMovieActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         
         <!-- TODO: Thêm các Activities khác khi implement -->
-        <!-- MovieDetailActivity, SearchMovieActivity, ProfileEditActivity, etc. -->
+        <!-- MovieDetailActivity, ProfileEditActivity, etc. -->
         
     </application>
 

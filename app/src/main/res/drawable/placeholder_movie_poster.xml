@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="240dp"
+    android:viewportWidth="160"
+    android:viewportHeight="240">
+
+    <!-- Nền trắng -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M0,0h160v240h-160z"/>
+
+    <!-- Chữ "Movie Poster" ở giữa (dùng text path) -->
+    <group
+        android:translateX="20"
+        android:translateY="120">
+        <path
+            android:fillColor="#FF888888"
+            android:pathData="M0,0h120v1h-120z"/> <!-- chỉ là placeholder line -->
+        <!-- Text chính thức phải convert sang path (dùng công cụ) -->
+    </group>
+</vector>
