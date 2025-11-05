@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="140dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="12dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Movie Poster -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/bg_movie_placeholder">
+
+            <ImageView
+                android:id="@+id/ivPoster"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/ic_launcher_background"
+                android:contentDescription="Movie Poster"/>
+
+            <!-- Placeholder Icon -->
+            <ImageView
+                android:id="@+id/ivPlaceholder"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_movie_placeholder"
+                android:alpha="0.3"
+                app:tint="@color/textSecondary"/>
+
+            <!-- Age Rating Badge - Bottom Right -->
+            <TextView
+                android:id="@+id/tvAgeRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_age_rating"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="T16"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="T16"/>
+
+        </FrameLayout>
+
+        <!-- Movie Info - Fixed height to align all cards -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="95dp"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:background="@color/cardBackground">
+
+            <!-- Title - Fixed 2 lines -->
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:textSize="14sp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:gravity="top"
+                tools:text="Avengers: Endgame"/>
+
+            <!-- Genre - Fixed 1 line -->
+            <TextView
+                android:id="@+id/tvGenre"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:layout_marginTop="2dp"
+                android:textSize="11sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textColor="@color/textSecondary"
+                android:gravity="top"
+                tools:text="Action, Sci-Fi"/>
+
+            <!-- Spacer - Fixed height -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"/>
+
+            <!-- Duration Row - Fixed position at bottom -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <!-- Duration group -->
+                <ImageView
+                    android:id="@+id/ivClock"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_gravity="bottom"
+                    android:src="@drawable/ic_clock"
+                    app:tint="@color/textSecondary"/>
+                    
+                <TextView
+                    android:id="@+id/tvDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="2dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/textSecondary"
+                    tools:text="181'"/>
+                
+                <!-- Hidden rating (for compatibility) -->
+                <TextView
+                    android:id="@+id/tvRating"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"/>
+                    
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

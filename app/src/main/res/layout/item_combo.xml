@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@color/backgroundCard"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Combo Image -->
+        <ImageView
+            android:id="@+id/ivCombo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:padding="8dp"
+            android:background="@drawable/bg_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Combo Name -->
+        <TextView
+            android:id="@+id/tvComboName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Combo 2 Big"
+            android:textColor="@color/textPrimary"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ivCombo"
+            app:layout_constraintTop_toTopOf="@id/ivCombo" />
+
+        <!-- Combo Description -->
+        <TextView
+            android:id="@+id/tvComboDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Nhân đôi sự sảng khoái! Combo gồm 1 bắp rang bơ lớn, 2 Pepsi cỡ lớn"
+            android:textColor="@color/textSecondary"
+            android:textSize="13sp"
+            android:maxLines="3"
+            android:ellipsize="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvComboName"
+            app:layout_constraintTop_toBottomOf="@id/tvComboName" />
+
+        <!-- Price & Quantity Selector Row -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="@id/ivCombo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/tvComboName"
+            app:layout_constraintTop_toBottomOf="@id/tvComboDescription">
+
+            <!-- Price -->
+            <TextView
+                android:id="@+id/tvComboPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="109,000đ"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <!-- Quantity Selector -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card">
+
+                <!-- Decrease Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDecrease"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="-"
+                    android:textSize="20sp"
+                    android:textColor="@color/textPrimary"
+                    android:backgroundTint="@color/backgroundInput"
+                    app:cornerRadius="8dp"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    app:strokeWidth="0dp" />
+
+                <!-- Quantity TextView -->
+                <TextView
+                    android:id="@+id/tvQuantity"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textAlignment="center"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <!-- Increase Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnIncrease"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:minWidth="0dp"
+                    android:minHeight="0dp"
+                    android:padding="0dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:text="+"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:backgroundTint="@color/colorPrimary"
+                    app:cornerRadius="8dp"
+                    style="@style/Widget.Material3.Button" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

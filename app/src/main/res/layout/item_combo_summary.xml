@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="6dp">
+
+    <ImageView
+        android:id="@+id/ivComboIcon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/combo1bap2nuoc"
+        android:background="@drawable/bg_card" />
+
+    <TextView
+        android:id="@+id/tvComboName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:text="1x Combo 2 Big"
+        android:textColor="@color/textPrimary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/btnRemoveComboItem"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        app:tint="@color/textSecondary"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="2dp" />
+
+</LinearLayout>

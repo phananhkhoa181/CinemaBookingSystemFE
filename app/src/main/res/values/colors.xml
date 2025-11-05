@@ -6,6 +6,7 @@
     
     <!-- Primary Theme Colors - Netflix Red -->
     <color name="colorPrimary">#E50914</color>
+    <color name="primaryColor">#E50914</color>
     <color name="colorPrimaryDark">#B20710</color>
     <color name="colorPrimaryLight">#FF2E38</color>
     <color name="colorAccent">#FFB800</color>
@@ -17,6 +18,8 @@
     <color name="backgroundInput">#2F2F2F</color>
     <color name="backgroundSecondary">#1E1E1E</color>
     <color name="cardBackground">#2C2C2C</color>
+    <color name="surface">#1F1F1F</color>
+    <color name="surfaceVariant">#2C2C2C</color>
     
     <!-- Text Colors -->
     <color name="textPrimary">#FFFFFF</color>
@@ -58,5 +61,18 @@
     <!-- Additional UI Colors -->
     <color name="overlay">#80000000</color>
     <color name="error">#F44336</color>
+    <color name="errorColor">#F44336</color>
     <color name="success">#4CAF50</color>
+    <color name="orange">#FF9800</color>
+    
+    <!-- Rating Color -->
+    <color name="ratingYellow">#FFD700</color>
+    <color name="ratingColor">#FFD700</color>
+    
+    <!-- Aliases for common usage -->
+    <color name="background">@color/backgroundColor</color>
+    <color name="card_background">@color/cardBackground</color>
+    <color name="text_secondary">@color/textSecondary</color>
+    <color name="text_hint">@color/textHint</color>
+    <color name="primary">@color/colorPrimary</color>
 </resources>

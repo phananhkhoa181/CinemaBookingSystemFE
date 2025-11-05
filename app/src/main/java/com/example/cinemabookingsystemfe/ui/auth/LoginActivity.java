@@ -96,11 +96,18 @@ public class LoginActivity extends AppCompatActivity {
                 
                 Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                 
-                // Navigate to MainActivity
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
+                // Check if this activity was started from MainActivity for auth check
+                if (getCallingActivity() != null) {
+                    // Return success result to MainActivity
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    // Navigate to MainActivity (first time login or from splash)
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                }
             }
             
             @Override
@@ -126,5 +133,14 @@ public class LoginActivity extends AppCompatActivity {
     
     private boolean isValidEmail(String email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+    
+    @Override
+    public void onBackPressed() {
+        // If called from MainActivity for auth, return CANCELLED result
+        if (getCallingActivity() != null) {
+            setResult(RESULT_CANCELED);
+        }
+        super.onBackPressed();
     }
 }

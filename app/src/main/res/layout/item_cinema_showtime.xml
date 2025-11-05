@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/spacing_md"
+    android:layout_marginBottom="@dimen/spacing_md"
+    app:cardBackgroundColor="@color/cardBackground"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation"
+    app:strokeColor="@color/border"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <!-- Cinema Name & Distance Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Cinema Name with Icon -->
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_location"
+                app:tint="@color/colorPrimary" />
+
+            <TextView
+                android:id="@+id/tvCinemaName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:text="Galaxy Co.opXtra Linh Trung"
+                android:textSize="16sp"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"
+                android:ellipsize="end"
+                android:maxLines="1" />
+
+            <!-- Expand/Collapse Icon -->
+            <ImageView
+                android:id="@+id/ivExpandCollapse"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:src="@drawable/ic_expand_more"
+                app:tint="@color/textSecondary"
+                android:rotation="0"
+                android:contentDescription="Expand" />
+
+        </LinearLayout>
+
+        <!-- Cinema Format Tags -->
+        <TextView
+            android:id="@+id/tvCinemaFormat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:text="2D PHỤ ĐỀ"
+            android:textSize="12sp"
+            android:textColor="@color/textSecondary" />
+
+        <!-- Showtimes Grid (FlexboxLayout alternative: use RecyclerView with GridLayoutManager) -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chipGroupShowtimes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            app:chipSpacing="@dimen/spacing_sm"
+            app:chipSpacingVertical="@dimen/spacing_sm" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -41,6 +41,13 @@
     <string name="status_completed">Hoàn thành</string>
     <string name="status_cancelled">Đã hủy</string>
     
+    <!-- Combo -->
+    <string name="combo_selection_title">Chọn combo bắp nước</string>
+    <string name="combo_selection_subtitle">Thêm combo để tận hưởng trải nghiệm xem phim tuyệt vời hơn!</string>
+    <string name="combo_total">Tổng tiền combo</string>
+    <string name="timer_hold_seat">Thời gian giữ ghế: %1$s</string>
+    <string name="timer_expired">Hết thời gian giữ ghế! Vui lòng chọn lại.</string>
+    
     <!-- Common -->
     <string name="confirm">Xác nhận</string>
     <string name="cancel">Hủy</string>
@@ -49,11 +56,12 @@
     <string name="edit">Chỉnh sửa</string>
     <string name="back">Quay lại</string>
     <string name="next">Tiếp theo</string>
+    <string name="continue_btn">Tiếp tục</string>
     <string name="skip">Bỏ qua</string>
     <string name="loading">Đang tải...</string>
     <string name="error">Lỗi</string>
     <string name="success">Thành công</string>
-    <string name="total_price">Tổng tiền</string>
+    <string name="total_price">Tổng Cộng</string>
     <string name="apply">Áp dụng</string>
     
     <!-- Error Messages -->

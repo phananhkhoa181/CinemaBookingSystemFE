@@ -99,32 +99,78 @@ public class RegisterActivity extends AppCompatActivity {
             etConfirmPassword.requestFocus();
             return;
         }
-        
+         
         // Show loading
         setLoading(true);
         
-        // Call API with mock data - using email as username
-        RegisterRequest request = new RegisterRequest(email, password, email, fullName);
-        request.setPhoneNumber(phone);
+        // Call real API - backend expects: fullname, email, password, confirmPassword, phone
+        RegisterRequest request = new RegisterRequest(fullName, email, password, confirmPassword, phone);
+        
+        // Debug: Log request data
+        android.util.Log.d("RegisterActivity", "=== REGISTER REQUEST ===");
+        android.util.Log.d("RegisterActivity", "Request Object: " + request.toString());
+        android.util.Log.d("RegisterActivity", "Full Name: " + fullName);
+        android.util.Log.d("RegisterActivity", "Email: " + email);
+        android.util.Log.d("RegisterActivity", "Phone: " + phone);
+        android.util.Log.d("RegisterActivity", "Phone from request: " + request.getPhone());
+        
+        // Verify Gson serialization
+        com.google.gson.Gson gson = new com.google.gson.Gson();
+        String jsonRequest = gson.toJson(request);
+        android.util.Log.d("RegisterActivity", "JSON Request: " + jsonRequest);
         
         authRepository.register(request, new ApiCallback<ApiResponse<RegisterResponse>>() {
             @Override
             public void onSuccess(ApiResponse<RegisterResponse> response) {
                 setLoading(false);
                 
-                Toast.makeText(RegisterActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                // Log response for debugging
+                android.util.Log.d("RegisterActivity", "onSuccess called - ALWAYS navigate to VerifyEmailActivity");
+                android.util.Log.d("RegisterActivity", "Response: " + (response != null ? response.getMessage() : "null"));
                 
-                // Navigate to MainActivity
-                Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
+                // Backend auto-sends OTP email after successful registration
+                // Always navigate to VerifyEmailActivity when onSuccess is called
+                Toast.makeText(RegisterActivity.this, 
+                    "Đăng ký thành công! Vui lòng kiểm tra email và nhập mã OTP.", 
+                    Toast.LENGTH_LONG).show();
+                
+                // Navigate to VerifyEmailActivity for OTP verification
+                android.util.Log.d("RegisterActivity", "Navigating to VerifyEmailActivity with email: " + email);
+                
+                try {
+                    Intent intent = new Intent(RegisterActivity.this, VerifyEmailActivity.class);
+                    intent.putExtra("email", email);
+                    intent.putExtra("otpType", "EmailVerification");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                    android.util.Log.d("RegisterActivity", "Successfully navigated to VerifyEmailActivity");
+                } catch (Exception e) {
+                    android.util.Log.e("RegisterActivity", "Failed to navigate: " + e.getMessage());
+                    Toast.makeText(RegisterActivity.this, 
+                        "Lỗi chuyển màn hình. Email: " + email, 
+                        Toast.LENGTH_LONG).show();
+                }
             }
             
             @Override
             public void onError(String errorMessage) {
                 setLoading(false);
-                Toast.makeText(RegisterActivity.this, "Lỗi: " + errorMessage, Toast.LENGTH_SHORT).show();
+                android.util.Log.e("RegisterActivity", "onError called: " + errorMessage);
+                
+                // Parse and show user-friendly error messages
+                String userMessage = errorMessage;
+                if (errorMessage.contains("Email already exists") || errorMessage.contains("email already")) {
+                    userMessage = "Email đã tồn tại. Vui lòng sử dụng email khác hoặc đăng nhập.";
+                } else if (errorMessage.contains("Invalid phone") || errorMessage.contains("phone")) {
+                    userMessage = "Số điện thoại không hợp lệ. Vui lòng kiểm tra lại.";
+                } else if (errorMessage.contains("Invalid email") || errorMessage.contains("email format")) {
+                    userMessage = "Email không hợp lệ. Vui lòng kiểm tra lại.";
+                } else if (errorMessage.contains("Password")) {
+                    userMessage = "Mật khẩu không đủ mạnh. Yêu cầu ít nhất 6 ký tự, có chữ hoa, chữ thường và số.";
+                }
+                
+                Toast.makeText(RegisterActivity.this, userMessage, Toast.LENGTH_LONG).show();
             }
         });
     }
