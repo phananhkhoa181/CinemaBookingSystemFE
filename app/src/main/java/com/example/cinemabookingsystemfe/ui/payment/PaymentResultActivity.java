@@ -15,6 +15,7 @@ import com.example.cinemabookingsystemfe.data.api.ApiCallback;
 import com.example.cinemabookingsystemfe.data.models.response.ApiResponse;
 import com.example.cinemabookingsystemfe.data.models.response.PaymentDetailResponse;
 import com.example.cinemabookingsystemfe.data.repository.PaymentRepository;
+import com.example.cinemabookingsystemfe.utils.NotificationHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
@@ -37,6 +38,7 @@ public class PaymentResultActivity extends AppCompatActivity {
     private MaterialButton btnViewBooking, btnBackHome;
     
     private PaymentRepository paymentRepository;
+    private NotificationHelper notificationHelper;
     private int paymentId;
     private int bookingId;
     private String status;
@@ -48,6 +50,7 @@ public class PaymentResultActivity extends AppCompatActivity {
         
         initViews();
         paymentRepository = PaymentRepository.getInstance(this);
+        notificationHelper = new NotificationHelper(this);
         
         handleDeepLink();
         
@@ -195,9 +198,11 @@ public class PaymentResultActivity extends AppCompatActivity {
         }
         
         // Booking code
+        String bookingCode = null;
         if (payment.getBooking() != null && payment.getBooking().getBookingCode() != null) {
-            tvBookingCode.setText(payment.getBooking().getBookingCode());
-            android.util.Log.d("PaymentResult", "Booking code: " + payment.getBooking().getBookingCode());
+            bookingCode = payment.getBooking().getBookingCode();
+            tvBookingCode.setText(bookingCode);
+            android.util.Log.d("PaymentResult", "Booking code: " + bookingCode);
         }
         
         // Transaction code
@@ -207,6 +212,11 @@ public class PaymentResultActivity extends AppCompatActivity {
                 shortCode = shortCode.substring(0, 20) + "...";
             }
             tvTransactionCode.setText("Giao dịch: " + shortCode);
+        }
+        
+        // Send notification if payment successful
+        if ("success".equalsIgnoreCase(status) && bookingCode != null) {
+            notificationHelper.showBookingSuccessNotification(bookingCode, payment.getAmount());
         }
     }
     

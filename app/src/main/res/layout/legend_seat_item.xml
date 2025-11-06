@@ -3,140 +3,98 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:gravity="center">
 
-    <!-- Row 1 -->
+    <!-- Ghế đơn -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="@dimen/spacing_xs">
-
-        <!-- Ghế đơn -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="@dimen/spacing_md">
+        android:gravity="center_vertical"
+        android:layout_marginEnd="@dimen/spacing_md">
 
         <View
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:background="@drawable/bg_seat_available" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="Ghế đơn"
-                android:textSize="10sp"
-                android:textColor="@color/textSecondary" />
-
-        </LinearLayout>
-
-        <!-- Ghế đôi -->
-        <LinearLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="@dimen/spacing_md">
+            android:layout_marginStart="4dp"
+            android:text="Ghế đơn"
+            android:textSize="10sp"
+            android:textColor="@color/textSecondary" />
 
-        <View
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:background="@drawable/bg_seat_couple" />
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="Ghế đôi"
-                android:textSize="10sp"
-                android:textColor="@color/textSecondary" />
-
-        </LinearLayout>
-
-        <!-- Ghế VIP -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="0dp">
+    <!-- Ghế VIP -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="@dimen/spacing_md">
 
         <View
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:background="@drawable/bg_seat_vip" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="Ghế VIP"
-                android:textSize="10sp"
-                android:textColor="@color/textSecondary" />
-
-        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="Ghế VIP"
+            android:textSize="10sp"
+            android:textColor="@color/textSecondary" />
 
     </LinearLayout>
 
-    <!-- Row 2 -->
+    <!-- Đã bán -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center_vertical"
+        android:layout_marginEnd="@dimen/spacing_md">
 
-        <!-- Đã bán -->
-        <LinearLayout
+        <View
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:background="@drawable/bg_seat_occupied" />
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="@dimen/spacing_md">
+            android:layout_marginStart="4dp"
+            android:text="Đã bán"
+            android:textSize="10sp"
+            android:textColor="@color/textSecondary" />
 
-            <View
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:background="@drawable/bg_seat_occupied" />
+    </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="Đã bán"
-                android:textSize="10sp"
-                android:textColor="@color/textSecondary" />
+    <!-- Đang chọn -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginEnd="0dp">
 
-        </LinearLayout>
+        <View
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:background="@drawable/bg_seat_selected" />
 
-        <!-- Đang chọn -->
-        <LinearLayout
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginEnd="0dp">
-
-            <View
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:background="@drawable/bg_seat_selected" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="Đang chọn"
-                android:textSize="10sp"
-                android:textColor="@color/textSecondary" />
-
-        </LinearLayout>
+            android:layout_marginStart="4dp"
+            android:text="Đang chọn"
+            android:textSize="10sp"
+            android:textColor="@color/textSecondary" />
 
     </LinearLayout>
 

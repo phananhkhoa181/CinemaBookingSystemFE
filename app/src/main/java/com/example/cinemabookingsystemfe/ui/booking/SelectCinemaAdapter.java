@@ -5,14 +5,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.LinearLayout;
+import android.view.Gravity;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.data.models.response.ShowtimesByDate;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -87,15 +87,13 @@ public class SelectCinemaAdapter extends RecyclerView.Adapter<SelectCinemaAdapte
     static class CinemaViewHolder extends RecyclerView.ViewHolder {
         
         private TextView tvCinemaName;
-        private TextView tvCinemaFormat;
-        private ChipGroup chipGroupShowtimes;
+        private LinearLayout layoutShowtimesContainer;
         private ImageView ivExpandCollapse;
         
         public CinemaViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCinemaName = itemView.findViewById(R.id.tvCinemaName);
-            tvCinemaFormat = itemView.findViewById(R.id.tvCinemaFormat);
-            chipGroupShowtimes = itemView.findViewById(R.id.chipGroupShowtimes);
+            layoutShowtimesContainer = itemView.findViewById(R.id.layoutShowtimesContainer);
             ivExpandCollapse = itemView.findViewById(R.id.ivExpandCollapse);
         }
         
@@ -134,86 +132,135 @@ public class SelectCinemaAdapter extends RecyclerView.Adapter<SelectCinemaAdapte
             
             if (isExpanded) {
                 // Expanded state - show all formats and showtimes
-                chipGroupShowtimes.setVisibility(View.VISIBLE);
-                tvCinemaFormat.setVisibility(View.GONE);
+                layoutShowtimesContainer.setVisibility(View.VISIBLE);
                 
-                // Clear previous chips
-                chipGroupShowtimes.removeAllViews();
+                // Clear previous views
+                layoutShowtimesContainer.removeAllViews();
                 
-                // Add format labels and showtime chips
+                // Add format groups with showtimes
                 for (Map.Entry<String, List<ShowtimesByDate.ShowtimeItem>> entry : groupedByFormat.entrySet()) {
-                    // Add format label as a disabled chip - FULL WIDTH xuống dòng riêng
-                    Chip formatChip = new Chip(itemView.getContext());
-                    formatChip.setText(entry.getKey());
-                    formatChip.setTextSize(12);
-                    formatChip.setChipBackgroundColorResource(R.color.cardBackground);
-                    formatChip.setTextColor(itemView.getContext().getColor(R.color.textSecondary));
-                    formatChip.setClickable(false);
-                    formatChip.setCheckable(false);
-                    formatChip.setChipStrokeWidth(0);
-                    
-                    // Set layout params MATCH_PARENT để xuống dòng riêng
-                    ChipGroup.LayoutParams formatParams = new ChipGroup.LayoutParams(
-                        ChipGroup.LayoutParams.MATCH_PARENT,
-                        ChipGroup.LayoutParams.WRAP_CONTENT
+                    // Create format group container
+                    LinearLayout formatGroup = new LinearLayout(itemView.getContext());
+                    formatGroup.setOrientation(LinearLayout.VERTICAL);
+                    LinearLayout.LayoutParams groupParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
                     );
-                    formatParams.setMargins(0, 12, 0, 4); // Margin top 12 để có khoảng cách
-                    formatChip.setLayoutParams(formatParams);
+                    groupParams.setMargins(0, 0, 0, dpToPx(16)); // 16dp bottom margin
+                    formatGroup.setLayoutParams(groupParams);
                     
-                    chipGroupShowtimes.addView(formatChip);
+                    // Add format title (e.g., "2D PHỤ ĐỀ")
+                    TextView formatTitle = new TextView(itemView.getContext());
+                    formatTitle.setText(entry.getKey());
+                    formatTitle.setTextSize(13);
+                    formatTitle.setTextColor(itemView.getContext().getColor(R.color.textSecondary));
+                    LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    formatTitle.setLayoutParams(titleParams);
+                    formatGroup.addView(formatTitle);
                     
-                    // Add showtime chips for this format
-                    for (ShowtimesByDate.ShowtimeItem showtime : entry.getValue()) {
-                        Chip showtimeChip = new Chip(itemView.getContext());
+                    // Create grid container for showtimes (Flow layout behavior)
+                    LinearLayout gridContainer = new LinearLayout(itemView.getContext());
+                    gridContainer.setOrientation(LinearLayout.VERTICAL);
+                    LinearLayout.LayoutParams gridParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    gridParams.setMargins(0, dpToPx(8), 0, 0); // 8dp top margin - ĐƯA GẦN LẠI
+                    gridContainer.setLayoutParams(gridParams);
+                    
+                    // Create rows of showtime boxes (3 per row)
+                    LinearLayout currentRow = null;
+                    int itemsInRow = 0;
+                    final int ITEMS_PER_ROW = 3;
+                    
+                    for (int i = 0; i < entry.getValue().size(); i++) {
+                        ShowtimesByDate.ShowtimeItem showtime = entry.getValue().get(i);
                         
-                        // Format time from "2025-11-05T11:00:00" to "11:00"
+                        // Create new row if needed
+                        if (itemsInRow == 0) {
+                            currentRow = new LinearLayout(itemView.getContext());
+                            currentRow.setOrientation(LinearLayout.HORIZONTAL);
+                            LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+                            currentRow.setLayoutParams(rowParams);
+                            gridContainer.addView(currentRow);
+                        }
+                        
+                        // Create showtime box
+                        TextView showtimeBox = new TextView(itemView.getContext());
                         String timeDisplay = formatTime(showtime.getStartTime());
-                        showtimeChip.setText(timeDisplay);
+                        showtimeBox.setText(timeDisplay);
+                        showtimeBox.setTextSize(14);
+                        showtimeBox.setTextColor(itemView.getContext().getColor(R.color.textPrimary));
+                        showtimeBox.setGravity(Gravity.CENTER);
+                        showtimeBox.setBackgroundResource(R.drawable.bg_showtime_box_selector);
+                        showtimeBox.setClickable(true);
+                        showtimeBox.setFocusable(true);
                         
-                        // LÀM TO CHIP VÀ TEXT HỢN
-                        showtimeChip.setTextSize(14); // Tăng từ 12 lên 14
-                        showtimeChip.setChipBackgroundColorResource(R.color.white);
-                        showtimeChip.setTextColor(itemView.getContext().getColor(R.color.black));
-                        showtimeChip.setChipStrokeWidth(2);
-                        showtimeChip.setChipStrokeColorResource(R.color.border);
+                        // Set padding for showtime box
+                        int paddingH = dpToPx(20);
+                        int paddingV = dpToPx(10);
+                        showtimeBox.setPadding(paddingH, paddingV, paddingH, paddingV);
                         
-                        // Căn giữa text và tăng chiều cao chip
-                        showtimeChip.setTextAlignment(android.view.View.TEXT_ALIGNMENT_CENTER);
-                        showtimeChip.setChipMinHeight(56); // Tăng height để chip lớn hơn
-                        showtimeChip.setMinWidth(80); // Đặt min width để đều nhau
-                        
-                        // Giảm margin để gần label hơn
-                        ChipGroup.LayoutParams showtimeParams = new ChipGroup.LayoutParams(
-                            ChipGroup.LayoutParams.WRAP_CONTENT,
-                            ChipGroup.LayoutParams.WRAP_CONTENT
+                        // Set layout params with margins
+                        LinearLayout.LayoutParams boxParams = new LinearLayout.LayoutParams(
+                            0,
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            1.0f // Equal weight for all items
                         );
-                        showtimeParams.setMargins(4, 4, 4, 4); // Giảm margin từ 8 xuống 4
-                        showtimeChip.setLayoutParams(showtimeParams);
+                        boxParams.setMargins(0, 0, dpToPx(8), dpToPx(8));
+                        showtimeBox.setLayoutParams(boxParams);
                         
-                        showtimeChip.setOnClickListener(v -> {
+                        showtimeBox.setOnClickListener(v -> {
                             if (listener != null) {
                                 listener.onShowtimeClick(showtime, cinema);
                             }
                         });
                         
-                        chipGroupShowtimes.addView(showtimeChip);
+                        currentRow.addView(showtimeBox);
+                        itemsInRow++;
+                        
+                        // Reset row counter after 3 items
+                        if (itemsInRow == ITEMS_PER_ROW) {
+                            itemsInRow = 0;
+                        }
                     }
+                    
+                    // Add empty placeholders to fill last row
+                    if (itemsInRow > 0 && itemsInRow < ITEMS_PER_ROW && currentRow != null) {
+                        for (int i = itemsInRow; i < ITEMS_PER_ROW; i++) {
+                            View placeholder = new View(itemView.getContext());
+                            LinearLayout.LayoutParams placeholderParams = new LinearLayout.LayoutParams(
+                                0,
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                1.0f
+                            );
+                            placeholderParams.setMargins(0, 0, dpToPx(8), dpToPx(8));
+                            placeholder.setLayoutParams(placeholderParams);
+                            currentRow.addView(placeholder);
+                        }
+                    }
+                    
+                    formatGroup.addView(gridContainer);
+                    layoutShowtimesContainer.addView(formatGroup);
                 }
             } else {
-                // Collapsed state - show format summary only
-                chipGroupShowtimes.setVisibility(View.GONE);
-                tvCinemaFormat.setVisibility(View.VISIBLE);
-                
-                // Show format summary (e.g., "2D Dubbed, 2D Subtitled")
-                StringBuilder formatSummary = new StringBuilder();
-                int index = 0;
-                for (String format : groupedByFormat.keySet()) {
-                    if (index > 0) formatSummary.append(", ");
-                    formatSummary.append(format);
-                    index++;
-                }
-                tvCinemaFormat.setText(formatSummary.toString());
+                // Collapsed state - hide showtimes
+                layoutShowtimesContainer.setVisibility(View.GONE);
             }
+        }
+        
+        /**
+         * Convert dp to pixels
+         */
+        private int dpToPx(int dp) {
+            float density = itemView.getContext().getResources().getDisplayMetrics().density;
+            return Math.round(dp * density);
         }
         
         /**

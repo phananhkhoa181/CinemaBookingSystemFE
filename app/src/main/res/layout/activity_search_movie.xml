@@ -176,19 +176,6 @@
                                 app:chipIconTint="@color/textSecondary"/>
 
                             <com.google.android.material.chip.Chip
-                                android:id="@+id/chipYear"
-                                style="@style/Widget.MaterialComponents.Chip.Filter"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Năm"
-                                android:textColor="@color/textPrimary"
-                                app:chipBackgroundColor="@color/backgroundCard"
-                                app:chipStrokeColor="@color/divider"
-                                app:chipStrokeWidth="1dp"
-                                app:chipIcon="@drawable/ic_calendar"
-                                app:chipIconTint="@color/textSecondary"/>
-
-                            <com.google.android.material.chip.Chip
                                 android:id="@+id/chipRating"
                                 style="@style/Widget.MaterialComponents.Chip.Filter"
                                 android:layout_width="wrap_content"

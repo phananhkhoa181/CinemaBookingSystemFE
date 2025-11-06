@@ -416,7 +416,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/ic_voucher"
-                            app:tint="@color/colorPrimary" />
+                            app:tint="#4CAF50" />
 
                         <TextView
                             android:id="@+id/tvVoucherName"
@@ -426,7 +426,7 @@
                             android:layout_marginStart="8dp"
                             android:text="Giảm 10%"
                             android:textSize="13sp"
-                            android:textColor="@color/textPrimary"
+                            android:textColor="#2E7D32"
                             android:textStyle="bold" />
 
                         <ImageView
@@ -550,6 +550,35 @@
                     android:text="304,000 đ"
                     android:textSize="13sp"
                     android:textColor="@color/textSecondary" />
+
+            </LinearLayout>
+
+            <!-- Promotion Discount (visible when promotion applied) -->
+            <LinearLayout
+                android:id="@+id/layoutPromotionDiscount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="6dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:id="@+id/tvPromotionName"
+                    android:text="Khuyến mãi"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/tvPromotionDiscount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-20,000 đ"
+                    android:textSize="13sp"
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 

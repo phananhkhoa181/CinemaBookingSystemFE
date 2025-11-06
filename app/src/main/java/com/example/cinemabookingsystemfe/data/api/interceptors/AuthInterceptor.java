@@ -53,11 +53,11 @@ public class AuthInterceptor implements Interceptor {
             Log.d(TAG, "Token expired (401), attempting refresh...");
             
             synchronized (this) {
-                // Close the previous response
-                response.close();
-                
                 // Try to refresh token
                 String newToken = refreshToken();
+                
+                // Close the previous response before proceeding
+                response.close();
                 
                 if (newToken != null) {
                     Log.d(TAG, "Token refreshed successfully");
@@ -68,9 +68,13 @@ public class AuthInterceptor implements Interceptor {
                             .build();
                     return chain.proceed(newRequest);
                 } else {
-                    Log.e(TAG, "Failed to refresh token");
-                    // Return original 401 response to trigger logout
-                    return response;
+                    Log.e(TAG, "Failed to refresh token, creating new 401 response");
+                    
+                    // Create a new 401 response since we closed the original one
+                    Request newRequest = originalRequest.newBuilder()
+                            .header("Authorization", "Bearer " + token)
+                            .build();
+                    return chain.proceed(newRequest);
                 }
             }
         }

@@ -119,6 +119,10 @@ public interface ApiService {
             @Query("sort") String sort
     );
     
+    // Create a review (requires authentication)
+    @POST("api/Reviews")
+    Call<ApiResponse<Void>> createReview(@Body com.example.cinemabookingsystemfe.data.models.request.CreateReviewRequest request);
+    
     // ====================================
     // BOOKINGS APIs
     // ====================================
@@ -176,6 +180,14 @@ public interface ApiService {
     // Get all combos (no authentication required)
     @GET("api/combos")
     Call<ApiResponse<List<Combo>>> getCombos();
+    
+    // ====================================
+    // PROMOTION APIs
+    // ====================================
+    
+    // Get active promotions (no authentication required)
+    @GET("api/Promotions/active")
+    Call<ApiResponse<List<Promotion>>> getActivePromotions();
     
     // ====================================
     // AUDITORIUM APIs

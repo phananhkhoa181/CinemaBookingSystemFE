@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginTop="12dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/cardBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvCustomerName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Người dùng ẩn danh"
+                android:textSize="15sp"
+                android:textColor="@color/textPrimary"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    app:tint="@color/ratingYellow"/>
+
+                <TextView
+                    android:id="@+id/tvRating"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="5"
+                    android:textSize="14sp"
+                    android:textColor="@color/ratingYellow"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvComment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Amazing movie! The storyline was captivating and the acting was superb."
+            android:textSize="14sp"
+            android:textColor="@color/textSecondary"
+            android:lineSpacingExtra="2dp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvCreatedAt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="03/11/2025"
+            android:textSize="12sp"
+            android:textColor="@color/textSecondary"/>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

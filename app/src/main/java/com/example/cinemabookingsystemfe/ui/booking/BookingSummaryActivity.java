@@ -39,14 +39,5 @@ public class BookingSummaryActivity extends AppCompatActivity {
             "\n\nTODO: Implement booking summary UI", 
             Toast.LENGTH_LONG).show();
         
-        // TODO: Implement:
-        // - Timer warning
-        // - Movie info card
-        // - Seats info card
-        // - Combos info card (optional)
-        // - Voucher input với validate
-        // - Price summary card
-        // - Payment button
-        // - Navigate to VNPayWebViewActivity
     }
 }

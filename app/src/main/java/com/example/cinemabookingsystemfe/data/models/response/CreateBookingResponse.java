@@ -44,6 +44,9 @@ public class CreateBookingResponse {
     @SerializedName("seats")
     private List<SeatInfo> seats;
     
+    @SerializedName("appliedPromotions")
+    private List<AppliedPromotion> appliedPromotions;
+    
     // Nested classes
     public static class MovieInfo {
         @SerializedName("movieid")
@@ -118,4 +121,5 @@ public class CreateBookingResponse {
     public CinemaInfo getCinema() { return cinema; }
     public ShowtimeInfo getShowtime() { return showtime; }
     public List<SeatInfo> getSeats() { return seats; }
+    public List<AppliedPromotion> getAppliedPromotions() { return appliedPromotions; }
 }

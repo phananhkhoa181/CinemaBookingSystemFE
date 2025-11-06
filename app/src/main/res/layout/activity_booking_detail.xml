@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="40dp">
+        android:paddingTop="80dp"
+        android:layout_gravity="center_vertical">
 
         <!-- White Card Container -->
         <com.google.android.material.card.MaterialCardView
@@ -188,7 +189,7 @@
 
                     </LinearLayout>
 
-                    <!-- Column 2: Stars -->
+                    <!-- Column 2: Phòng -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -199,12 +200,12 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Stars"
+                            android:text="Phòng"
                             android:textColor="#666666"
                             android:textSize="13sp"/>
 
                         <TextView
-                            android:id="@+id/tvStars"
+                            android:id="@+id/tvAuditorium"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"

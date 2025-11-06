@@ -3,6 +3,9 @@ package com.example.cinemabookingsystemfe.ui.booking;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.StrikethroughSpan;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,14 +17,18 @@ import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.data.api.ApiCallback;
 import com.example.cinemabookingsystemfe.data.models.request.CreateBookingRequest;
 import com.example.cinemabookingsystemfe.data.models.response.ApiResponse;
-import com.example.cinemabookingsystemfe.data.models.response.AvailableSeatsResponse;
+import com.example.cinemabookingsystemfe.data.models.response.AppliedPromotion;
+import com.example.cinemabookingsystemfe.data.models.response.AuditoriumSeatsResponse;
 import com.example.cinemabookingsystemfe.data.models.response.CreateBookingResponse;
+import com.example.cinemabookingsystemfe.data.models.response.Promotion;
 import com.example.cinemabookingsystemfe.data.models.response.Seat;
+import com.example.cinemabookingsystemfe.data.repository.PromotionRepository;
 import com.example.cinemabookingsystemfe.data.repository.ShowtimeRepository;
 import com.example.cinemabookingsystemfe.data.repository.VoucherRepository;
 import com.example.cinemabookingsystemfe.utils.TokenManager;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -52,9 +59,10 @@ public class SelectSeatActivity extends AppCompatActivity {
 
     private MaterialToolbar toolbar;
     private TextView tvMovieTitle, tvShowtimeInfo, tvShowtimeDateTime, tvRating;
-    private TextView tvSeatCount, tvTotalAmount;
+    private TextView tvSeatCount, tvTotalAmount, tvOriginalPrice, tvPromotionNotice;
     private RecyclerView rvSeatMap;
     private MaterialButton btnContinue;
+    private com.google.android.material.card.MaterialCardView cardPromotionNotice;
 
     private static final int REQUEST_CODE_LOGIN = 1001;
     
@@ -68,6 +76,7 @@ public class SelectSeatActivity extends AppCompatActivity {
     private String movieTitle, cinemaName, showtimeFormat, showtimeTime, showtimeDate, movieRating, moviePosterUrl;
 
     private ShowtimeRepository showtimeRepository;
+    private com.example.cinemabookingsystemfe.data.repository.PromotionRepository promotionRepository;
     private TokenManager tokenManager;
     
     private CountDownTimer countDownTimer;
@@ -79,6 +88,10 @@ public class SelectSeatActivity extends AppCompatActivity {
     private static final int MAX_SEATS_TO_SELECT = 10;   // Max seats user can select at once
     
     private boolean isWaitingForLogin = false;
+    
+    // Active promotions
+    private List<com.example.cinemabookingsystemfe.data.models.response.Promotion> activePromotions;
+    private double promotionDiscountPercent = 0; // Store discount percentage if any
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,12 +119,16 @@ public class SelectSeatActivity extends AppCompatActivity {
 
         // Initialize repositories
         showtimeRepository = ShowtimeRepository.getInstance(this);
+        promotionRepository = PromotionRepository.getInstance(this);
         tokenManager = TokenManager.getInstance(this);
 
         initViews();
         setupToolbar();
         displayMovieInfo();
         setupSeatMap();
+        
+        // Load active promotions first
+        loadActivePromotions();
         
         // Load seats from API
         loadSeatsFromAPI();
@@ -149,6 +166,9 @@ public class SelectSeatActivity extends AppCompatActivity {
         tvRating = findViewById(R.id.tvRating);
         tvSeatCount = findViewById(R.id.tvSeatCount);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
+        tvOriginalPrice = findViewById(R.id.tvOriginalPrice);
+        tvPromotionNotice = findViewById(R.id.tvPromotionNotice);
+        cardPromotionNotice = findViewById(R.id.cardPromotionNotice);
         rvSeatMap = findViewById(R.id.rvSeatMap);
         btnContinue = findViewById(R.id.btnContinue);
     }
@@ -213,6 +233,42 @@ public class SelectSeatActivity extends AppCompatActivity {
         rvSeatMap.setAdapter(seatRowAdapter);
     }
 
+    /**
+     * Load active promotions to check if discount applies
+     */
+    private void loadActivePromotions() {
+        promotionRepository.getActivePromotions(new ApiCallback<ApiResponse<List<Promotion>>>() {
+            @Override
+            public void onSuccess(ApiResponse<List<Promotion>> response) {
+                if (response != null && response.getData() != null && !response.getData().isEmpty()) {
+                    activePromotions = response.getData();
+                    Promotion promotion = activePromotions.get(0);
+                    
+                    // Store discount percentage for calculation
+                    if ("Percent".equalsIgnoreCase(promotion.getDiscountType())) {
+                        promotionDiscountPercent = promotion.getDiscountValue();
+                        
+                        // Show promotion notice
+                        runOnUiThread(() -> {
+                            cardPromotionNotice.setVisibility(android.view.View.VISIBLE);
+                            tvPromotionNotice.setText("Đã áp dụng " + promotion.getName() + 
+                                " - " + promotion.getDiscountBadgeText());
+                        });
+                        
+                        android.util.Log.d("SelectSeat", "Active promotion: " + promotion.getName() + 
+                            " - Discount: " + promotionDiscountPercent + "%");
+                    }
+                }
+            }
+            
+            @Override
+            public void onError(String errorMessage) {
+                // Promotion is optional, silently fail
+                android.util.Log.d("SelectSeat", "No active promotions or error: " + errorMessage);
+            }
+        });
+    }
+    
     /**
      * Load seats from API: GET /api/auditoriums/{id}/seats?showtimeId={showtimeId}
      */
@@ -348,6 +404,7 @@ public class SelectSeatActivity extends AppCompatActivity {
             btnContinue.setEnabled(false);
             tvSeatCount.setText("0x ghế:");
             tvTotalAmount.setText("Tổng Cộng: 0đ");
+            tvOriginalPrice.setVisibility(android.view.View.GONE);
         } else {
             btnContinue.setEnabled(true);
             
@@ -360,15 +417,38 @@ public class SelectSeatActivity extends AppCompatActivity {
                 }
             }
             
-            // Calculate total (all seats same price from showtime)
-            double total = 0;
+            // Calculate original total
+            double originalTotal = 0;
             for (Seat seat : selectedSeats) {
-                total += seat.getPrice();
+                originalTotal += seat.getPrice();
             }
             
             DecimalFormat formatter = new DecimalFormat("#,###");
             tvSeatCount.setText(selectedSeats.size() + "x ghế: " + seatNumbers.toString());
-            tvTotalAmount.setText("Tổng Cộng: " + formatter.format(total) + "đ");
+            
+            // If promotion active, show original price strikethrough and discounted price
+            if (promotionDiscountPercent > 0) {
+                double discountedTotal = originalTotal * (100 - promotionDiscountPercent) / 100;
+                
+                // Show original price with strikethrough
+                String originalPriceText = formatter.format(originalTotal) + "đ";
+                SpannableString spannableOriginal = new SpannableString(originalPriceText);
+                spannableOriginal.setSpan(new StrikethroughSpan(), 0, originalPriceText.length(), 
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                tvOriginalPrice.setText(spannableOriginal);
+                tvOriginalPrice.setVisibility(android.view.View.VISIBLE);
+                
+                // Show discounted price with highlight
+                tvTotalAmount.setText(" " + formatter.format(discountedTotal) + "đ");
+                tvTotalAmount.setTextColor(getResources().getColor(R.color.primaryColor));
+                tvTotalAmount.setTextSize(14);
+            } else {
+                // No promotion, show normal price
+                tvOriginalPrice.setVisibility(android.view.View.GONE);
+                tvTotalAmount.setText("Tổng Cộng: " + formatter.format(originalTotal) + "đ");
+                tvTotalAmount.setTextColor(getResources().getColor(R.color.textSecondary));
+                tvTotalAmount.setTextSize(12);
+            }
         }
     }
 
@@ -486,11 +566,11 @@ public class SelectSeatActivity extends AppCompatActivity {
      * Navigate to combo selection with booking data
      */
     private void navigateToComboSelection(CreateBookingResponse booking) {
-        // Calculate total seat price
-        double totalSeatPrice = 0;
-        for (Seat seat : selectedSeats) {
-            totalSeatPrice += seat.getPrice();
-        }
+        // Get actual seat price from booking response (after promotion discount)
+        double totalSeatPrice = booking.getTotalAmount(); // This is already discounted by backend
+        
+        // Get applied promotions from booking
+        List<AppliedPromotion> appliedPromotions = booking.getAppliedPromotions();
         
         // Build seat names string
         ArrayList<Integer> seatIdList = new ArrayList<>();
@@ -509,7 +589,7 @@ public class SelectSeatActivity extends AppCompatActivity {
         intent.putExtra(SelectComboActivity.EXTRA_BOOKING_ID, booking.getBookingId());
         intent.putExtra(SelectComboActivity.EXTRA_SEAT_IDS, seatIdList);
         intent.putExtra(SelectComboActivity.EXTRA_SEAT_NAMES, seatNames.toString());
-        intent.putExtra(SelectComboActivity.EXTRA_SEAT_TOTAL_PRICE, totalSeatPrice);
+        intent.putExtra(SelectComboActivity.EXTRA_SEAT_TOTAL_PRICE, totalSeatPrice); // Already discounted price
         intent.putExtra(SelectComboActivity.EXTRA_MOVIE_TITLE, movieTitle);
         intent.putExtra(SelectComboActivity.EXTRA_CINEMA_NAME, cinemaName);
         intent.putExtra(SelectComboActivity.EXTRA_SHOWTIME_INFO, showtimeDate + " - " + showtimeTime);
@@ -517,6 +597,12 @@ public class SelectSeatActivity extends AppCompatActivity {
         intent.putExtra(SelectComboActivity.EXTRA_MOVIE_RATING, movieRating);
         intent.putExtra(SelectComboActivity.EXTRA_MOVIE_POSTER, moviePosterUrl);
         intent.putExtra(SelectComboActivity.EXTRA_TIMER_REMAINING, timerRemaining);
+        
+        // Pass applied promotions as serializable
+        if (appliedPromotions != null && !appliedPromotions.isEmpty()) {
+            intent.putExtra(SelectComboActivity.EXTRA_APPLIED_PROMOTIONS, 
+                new ArrayList<>(appliedPromotions));
+        }
         
         startActivity(intent);
         // Don't finish() - allow user to go back if needed

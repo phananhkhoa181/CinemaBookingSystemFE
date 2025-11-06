@@ -22,6 +22,7 @@ import com.example.cinemabookingsystemfe.data.api.ApiCallback;
 import com.example.cinemabookingsystemfe.data.models.request.AddCombosRequest;
 import com.example.cinemabookingsystemfe.data.models.response.AddCombosResponse;
 import com.example.cinemabookingsystemfe.data.models.response.ApiResponse;
+import com.example.cinemabookingsystemfe.data.models.response.AppliedPromotion;
 import com.example.cinemabookingsystemfe.data.models.response.Combo;
 import com.example.cinemabookingsystemfe.data.repository.ComboRepository;
 import com.example.cinemabookingsystemfe.data.repository.VoucherRepository;
@@ -58,6 +59,7 @@ public class SelectComboActivity extends AppCompatActivity {
     public static final String EXTRA_MOVIE_RATING = "movie_rating";
     public static final String EXTRA_MOVIE_POSTER = "movie_poster";
     public static final String EXTRA_TIMER_REMAINING = "timer_remaining";
+    public static final String EXTRA_APPLIED_PROMOTIONS = "applied_promotions";
 
     private MaterialToolbar toolbar;
     private TextView tvTimeRemaining, tvTotalAmount, tvSelectedSeats;
@@ -82,8 +84,9 @@ public class SelectComboActivity extends AppCompatActivity {
     private String format;
     private String movieRating;
     private String moviePosterUrl;
-    private double seatTotalPrice; // Total price of selected seats
+    private double seatTotalPrice; // Total price of selected seats (already discounted by promotion)
     private long timerRemaining; // in milliseconds
+    private ArrayList<AppliedPromotion> appliedPromotions; // Promotions applied to seats
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +106,7 @@ public class SelectComboActivity extends AppCompatActivity {
         movieRating = getIntent().getStringExtra(EXTRA_MOVIE_RATING);
         moviePosterUrl = getIntent().getStringExtra(EXTRA_MOVIE_POSTER);
         timerRemaining = getIntent().getLongExtra(EXTRA_TIMER_REMAINING, 15 * 60 * 1000);
+        appliedPromotions = (ArrayList<AppliedPromotion>) getIntent().getSerializableExtra(EXTRA_APPLIED_PROMOTIONS);
 
         // Initialize repository
         comboRepository = ComboRepository.getInstance(this);
@@ -593,19 +597,23 @@ public class SelectComboActivity extends AppCompatActivity {
 
         // Build combo data HashMap
         HashMap<String, Integer> comboData = new HashMap<>();
+        HashMap<String, String> comboDescriptions = new HashMap<>();
         Map<Integer, Integer> quantities = adapter.getQuantities();
         
         for (Combo combo : selectedCombos) {
             int quantity = quantities.getOrDefault(combo.getComboId(), 0);
             if (quantity > 0) {
                 comboData.put(combo.getName(), quantity);
+                if (combo.getDescription() != null) {
+                    comboDescriptions.put(combo.getName(), combo.getDescription());
+                }
                 android.util.Log.d("SelectCombo", "Adding combo: " + combo.getName() + " x " + quantity);
             }
         }
         
         android.util.Log.d("SelectCombo", "Combo data size: " + comboData.size() + ", Total combo price: " + totalComboPrice);
 
-        navigateToBookingSummaryIntent(comboData, totalComboPrice);
+        navigateToBookingSummaryIntent(comboData, comboDescriptions, totalComboPrice);
     }
     
     /**
@@ -635,23 +643,31 @@ public class SelectComboActivity extends AppCompatActivity {
 
         // Build combo data from API response
         HashMap<String, Integer> comboData = new HashMap<>();
+        HashMap<String, String> comboDescriptions = new HashMap<>();
         
         if (apiData.getCombos() != null) {
             for (AddCombosResponse.ComboDetail comboDetail : apiData.getCombos()) {
                 comboData.put(comboDetail.getName(), comboDetail.getQuantity());
+                
+                // Get description from adapter's combo list
+                Combo combo = adapter.getComboByName(comboDetail.getName());
+                if (combo != null && combo.getDescription() != null) {
+                    comboDescriptions.put(comboDetail.getName(), combo.getDescription());
+                }
+                
                 android.util.Log.d("SelectCombo", "API Combo: " + comboDetail.getName() + " x " + comboDetail.getQuantity() + " = " + comboDetail.getPrice() + "đ");
             }
         }
         
         android.util.Log.d("SelectCombo", "Combo data from API size: " + comboData.size() + ", Total: " + calculatedComboTotal);
 
-        navigateToBookingSummaryIntent(comboData, calculatedComboTotal);
+        navigateToBookingSummaryIntent(comboData, comboDescriptions, calculatedComboTotal);
     }
     
     /**
      * Common method to create intent and navigate
      */
-    private void navigateToBookingSummaryIntent(HashMap<String, Integer> comboData, double totalComboPrice) {
+    private void navigateToBookingSummaryIntent(HashMap<String, Integer> comboData, HashMap<String, String> comboDescriptions, double totalComboPrice) {
         // Navigate to BookingSummaryActivity
         Intent intent = new Intent(this, com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.class);
         intent.putExtra(com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.EXTRA_BOOKING_ID, bookingId);
@@ -666,8 +682,15 @@ public class SelectComboActivity extends AppCompatActivity {
         intent.putExtra(com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.EXTRA_SEAT_COUNT, seatIds != null ? seatIds.size() : 0);
         intent.putExtra(com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.EXTRA_SEAT_PRICE, seatTotalPrice);
         intent.putExtra(com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.EXTRA_COMBO_DATA, comboData);
+        intent.putExtra(com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.EXTRA_COMBO_DESCRIPTIONS, comboDescriptions);
         intent.putExtra(com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.EXTRA_COMBO_PRICE, totalComboPrice);
         intent.putExtra(com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.EXTRA_TIMER_REMAINING, timerRemaining);
+        
+        // Pass applied promotions
+        if (appliedPromotions != null && !appliedPromotions.isEmpty()) {
+            intent.putExtra(com.example.cinemabookingsystemfe.ui.payment.BookingSummaryActivity.EXTRA_APPLIED_PROMOTIONS, 
+                appliedPromotions);
+        }
         
         startActivity(intent);
         // Don't finish() - allow user to go back to combo selection

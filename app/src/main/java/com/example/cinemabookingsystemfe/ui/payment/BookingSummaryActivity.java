@@ -19,6 +19,7 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.data.api.ApiCallback;
 import com.example.cinemabookingsystemfe.data.models.response.ApiResponse;
+import com.example.cinemabookingsystemfe.data.models.response.AppliedPromotion;
 import com.example.cinemabookingsystemfe.data.models.response.ApplyVoucherResponse;
 import com.example.cinemabookingsystemfe.data.models.response.Combo;
 import com.example.cinemabookingsystemfe.data.models.response.CreatePaymentResponse;
@@ -26,6 +27,7 @@ import com.example.cinemabookingsystemfe.data.models.response.PaymentDetailRespo
 import com.example.cinemabookingsystemfe.data.repository.PaymentRepository;
 import com.example.cinemabookingsystemfe.data.repository.VoucherRepository;
 import com.example.cinemabookingsystemfe.ui.booking.SelectComboActivity;
+import com.example.cinemabookingsystemfe.utils.NotificationHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -55,8 +57,10 @@ public class BookingSummaryActivity extends AppCompatActivity {
     public static final String EXTRA_SEAT_COUNT = "seat_count";
     public static final String EXTRA_SEAT_PRICE = "seat_price";
     public static final String EXTRA_COMBO_DATA = "combo_data";
+    public static final String EXTRA_COMBO_DESCRIPTIONS = "combo_descriptions";
     public static final String EXTRA_COMBO_PRICE = "combo_price";
     public static final String EXTRA_TIMER_REMAINING = "timer_remaining";
+    public static final String EXTRA_APPLIED_PROMOTIONS = "applied_promotions";
 
     private MaterialToolbar toolbar;
     private ImageView ivMoviePoster;
@@ -68,8 +72,9 @@ public class BookingSummaryActivity extends AppCompatActivity {
     private TextView tvComboPrice;
     private EditText etVoucherCode;
     private MaterialButton btnApplyVoucher, btnPayment, btnCancelBooking;
-    private LinearLayout layoutAppliedVoucher, layoutDiscount;
+    private LinearLayout layoutAppliedVoucher, layoutDiscount, layoutPromotionDiscount;
     private TextView tvVoucherName, tvSubtotal, tvDiscount, tvTotal;
+    private TextView tvPromotionName, tvPromotionDiscount;
     private ImageView btnRemoveVoucher;
 
     private CountDownTimer countDownTimer;
@@ -89,9 +94,12 @@ public class BookingSummaryActivity extends AppCompatActivity {
     private long timerRemaining;
     
     private HashMap<String, Integer> comboData; // comboName -> quantity
+    private HashMap<String, String> comboDescriptions; // comboName -> description
     
     private double discountAmount = 0;
     private String appliedVoucherCode = "";
+    private ArrayList<AppliedPromotion> appliedPromotions; // Promotions applied to seats
+    private String bookingCodeForCancel; // Store booking code for notification
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +114,7 @@ public class BookingSummaryActivity extends AppCompatActivity {
         displayMovieInfo();
         displaySeats();
         displayCombos();
+        displayPromotionDiscount();
         calculateTotal();
         setupListeners();
         startCountdownTimer();
@@ -126,15 +135,30 @@ public class BookingSummaryActivity extends AppCompatActivity {
         comboPrice = getIntent().getDoubleExtra(EXTRA_COMBO_PRICE, 0);
         timerRemaining = getIntent().getLongExtra(EXTRA_TIMER_REMAINING, 15 * 60 * 1000);
         
+        // Get applied promotions
+        appliedPromotions = (ArrayList<AppliedPromotion>) getIntent().getSerializableExtra(EXTRA_APPLIED_PROMOTIONS);
+        
         android.util.Log.d("BookingSummary", "=== RECEIVED DATA ===");
         android.util.Log.d("BookingSummary", "Booking ID: " + bookingId);
         android.util.Log.d("BookingSummary", "Seat Price: " + seatPrice);
         android.util.Log.d("BookingSummary", "Combo Price: " + comboPrice);
+        if (appliedPromotions != null && !appliedPromotions.isEmpty()) {
+            android.util.Log.d("BookingSummary", "Applied Promotions: " + appliedPromotions.size());
+            for (AppliedPromotion promo : appliedPromotions) {
+                android.util.Log.d("BookingSummary", "  - " + promo.getName() + ": -" + promo.getDiscountApplied() + " VND");
+            }
+        }
         
         // Get combo data (HashMap)
         comboData = (HashMap<String, Integer>) getIntent().getSerializableExtra(EXTRA_COMBO_DATA);
         if (comboData == null) {
             comboData = new HashMap<>();
+        }
+        
+        // Get combo descriptions (HashMap)
+        comboDescriptions = (HashMap<String, String>) getIntent().getSerializableExtra(EXTRA_COMBO_DESCRIPTIONS);
+        if (comboDescriptions == null) {
+            comboDescriptions = new HashMap<>();
         }
         
         android.util.Log.d("BookingSummary", "Combo Data size: " + comboData.size());
@@ -164,10 +188,13 @@ public class BookingSummaryActivity extends AppCompatActivity {
         btnCancelBooking = findViewById(R.id.btnCancelBooking);
         layoutAppliedVoucher = findViewById(R.id.layoutAppliedVoucher);
         layoutDiscount = findViewById(R.id.layoutDiscount);
+        layoutPromotionDiscount = findViewById(R.id.layoutPromotionDiscount);
         tvVoucherName = findViewById(R.id.tvVoucherName);
         tvSubtotal = findViewById(R.id.tvSubtotal);
         tvDiscount = findViewById(R.id.tvDiscount);
         tvTotal = findViewById(R.id.tvTotal);
+        tvPromotionName = findViewById(R.id.tvPromotionName);
+        tvPromotionDiscount = findViewById(R.id.tvPromotionDiscount);
         btnRemoveVoucher = findViewById(R.id.btnRemoveVoucher);
     }
 
@@ -272,19 +299,51 @@ public class BookingSummaryActivity extends AppCompatActivity {
                     .inflate(R.layout.item_booking_combo, layoutComboList, false);
                 
                 ImageView ivComboIcon = comboItemView.findViewById(R.id.ivComboIcon);
+                TextView tvQuantity = comboItemView.findViewById(R.id.tvQuantity);
                 TextView tvComboItem = comboItemView.findViewById(R.id.tvComboItem);
+                TextView tvComboDescription = comboItemView.findViewById(R.id.tvComboDescription);
                 
                 // Set combo image based on combo name
                 int imageRes = getComboImageResource(comboName);
                 ivComboIcon.setImageResource(imageRes);
                 
-                tvComboItem.setText(quantity + "x " + comboName);
+                tvQuantity.setText(quantity + "x");
+                tvComboItem.setText(comboName);
+                
+                // Set description if available
+                String description = comboDescriptions.get(comboName);
+                if (description != null && !description.isEmpty()) {
+                    tvComboDescription.setText(description);
+                    tvComboDescription.setVisibility(View.VISIBLE);
+                } else {
+                    tvComboDescription.setVisibility(View.GONE);
+                }
                 
                 layoutComboList.addView(comboItemView);
             }
         }
         
         tvComboPrice.setText(formatter.format(comboPrice) + " đ");
+    }
+
+    private void displayPromotionDiscount() {
+        // Check if there are applied promotions
+        if (appliedPromotions == null || appliedPromotions.isEmpty()) {
+            layoutPromotionDiscount.setVisibility(View.GONE);
+            return;
+        }
+        
+        // Display first promotion (assuming one promotion per booking)
+        AppliedPromotion promotion = appliedPromotions.get(0);
+        
+        layoutPromotionDiscount.setVisibility(View.VISIBLE);
+        tvPromotionName.setText(promotion.getName());
+        
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        tvPromotionDiscount.setText("-" + formatter.format(promotion.getDiscountApplied()) + " đ");
+        
+        android.util.Log.d("BookingSummary", "Displaying promotion: " + promotion.getName() + 
+            " with discount: " + promotion.getDiscountApplied());
     }
 
     private void calculateTotal() {
@@ -637,6 +696,12 @@ public class BookingSummaryActivity extends AppCompatActivity {
     }
 
     private void cancelBookingAndFinish() {
+        // Generate booking code for notification (format: M88-YYYYMMDD-XXXXX)
+        String generatedBookingCode = String.format("M88-%s-%05d", 
+            new java.text.SimpleDateFormat("yyyyMMdd", java.util.Locale.getDefault()).format(new java.util.Date()),
+            bookingId % 100000);
+        bookingCodeForCancel = generatedBookingCode;
+        
         VoucherRepository voucherRepository = VoucherRepository.getInstance(this);
         
         voucherRepository.cancelBooking(bookingId, new ApiCallback<ApiResponse<Void>>() {
@@ -646,6 +711,10 @@ public class BookingSummaryActivity extends AppCompatActivity {
                 if (countDownTimer != null) {
                     countDownTimer.cancel();
                 }
+                
+                // Send cancellation notification
+                NotificationHelper notificationHelper = new NotificationHelper(BookingSummaryActivity.this);
+                notificationHelper.showBookingCancelledNotification(bookingCodeForCancel);
                 
                 Toast.makeText(BookingSummaryActivity.this, 
                     "Đã hủy đặt vé thành công", 
