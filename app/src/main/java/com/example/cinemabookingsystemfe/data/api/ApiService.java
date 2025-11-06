@@ -207,4 +207,16 @@ public interface ApiService {
     // Get customer profile (requires authentication)
     @GET("api/customers/profile")
     Call<ApiResponse<CustomerProfile>> getCustomerProfile();
+    
+    // Update customer profile (requires authentication)
+    @PUT("api/Customers/profile")
+    Call<ApiResponse<CustomerProfile>> updateCustomerProfile(@Body UpdateCustomerRequest request);
+    
+    // ====================================
+    // USERS APIs
+    // ====================================
+    
+    // Update user information (requires authentication)
+    @PUT("api/Users/{id}")
+    Call<ApiResponse<UpdateUserResponse>> updateUser(@Path("id") int userId, @Body UpdateUserRequest request);
 }

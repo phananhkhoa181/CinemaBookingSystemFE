@@ -148,6 +148,10 @@ public class BookingAdapter extends RecyclerView.Adapter<BookingAdapter.BookingV
                     statusText = "Đã xác nhận";
                     colorRes = R.color.colorPrimary;
                     break;
+                case "CheckedIn":
+                    statusText = "Đã check-in";
+                    colorRes = R.color.statusSuccess;
+                    break;
                 case "Completed":
                     statusText = "Hoàn thành";
                     colorRes = R.color.statusSuccess;
