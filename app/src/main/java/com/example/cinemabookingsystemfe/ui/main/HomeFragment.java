@@ -21,25 +21,35 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.cinemabookingsystemfe.R;
+import com.example.cinemabookingsystemfe.data.api.ApiCallback;
+import com.example.cinemabookingsystemfe.data.models.response.ApiResponse;
 import com.example.cinemabookingsystemfe.data.models.response.Movie;
+import com.example.cinemabookingsystemfe.data.models.response.Promotion;
+import com.example.cinemabookingsystemfe.data.repository.PromotionRepository;
 import com.example.cinemabookingsystemfe.ui.adapters.PromotionAdapter;
 import com.example.cinemabookingsystemfe.ui.adapters.MovieAdapter;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
+
+import java.util.List;
 
 public class HomeFragment extends Fragment {
     
     private ViewPager2 vpBanner;
     private TabLayout tabIndicator;
     private TabLayout tabMovies;
-    private ImageButton btnPrevBanner, btnNextBanner;
     private ImageButton btnNotification;
     private RecyclerView rvMovies;
     private ProgressBar progressBar;
+    private View promotionBannerView;
+    private TextView tvPromotionName, tvPromotionDescription, tvPromotionDiscount;
     
     private HomeViewModel viewModel;
+    private PromotionRepository promotionRepository;
     private PromotionAdapter promotionAdapter;
     private MovieAdapter movieAdapter;
+    private List<Promotion> activePromotions;
     
     private Handler bannerHandler;
     private Runnable bannerRunnable;
@@ -56,11 +66,15 @@ public class HomeFragment extends Fragment {
         initViewModel();
         setupBanner();
         setupMoviesRecyclerView();
+        setupPromotionBanner();
         setupListeners();
         observeViewModel();
         
         // Load data from ViewModel
         viewModel.loadHomeData();
+        
+        // Load active promotions
+        loadActivePromotions();
         
         return view;
     }
@@ -69,11 +83,17 @@ public class HomeFragment extends Fragment {
         vpBanner = view.findViewById(R.id.vpBanner);
         tabIndicator = view.findViewById(R.id.tabIndicator);
         tabMovies = view.findViewById(R.id.tabMovies);
-        btnPrevBanner = view.findViewById(R.id.btnPrevBanner);
-        btnNextBanner = view.findViewById(R.id.btnNextBanner);
         btnNotification = view.findViewById(R.id.btnNotification);
         rvMovies = view.findViewById(R.id.rvMovies);
         progressBar = view.findViewById(R.id.progressBar);
+        
+        // Promotion banner views
+        promotionBannerView = view.findViewById(R.id.promotionBanner);
+        if (promotionBannerView != null) {
+            tvPromotionName = promotionBannerView.findViewById(R.id.tvPromotionName);
+            tvPromotionDescription = promotionBannerView.findViewById(R.id.tvPromotionDescription);
+            tvPromotionDiscount = promotionBannerView.findViewById(R.id.tvPromotionDiscount);
+        }
         
         // Setup SearchView
         try {
@@ -129,6 +149,65 @@ public class HomeFragment extends Fragment {
     
     private void initViewModel() {
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        promotionRepository = PromotionRepository.getInstance(requireContext());
+    }
+    
+    private void setupPromotionBanner() {
+        if (promotionBannerView != null) {
+            promotionBannerView.setOnClickListener(v -> {
+                if (activePromotions != null && !activePromotions.isEmpty()) {
+                    Promotion promo = activePromotions.get(0);
+                    Toast.makeText(requireContext(), 
+                        promo.getDescription(), 
+                        Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
+    
+    private void loadActivePromotions() {
+        android.util.Log.d("HomeFragment", "Loading active promotions...");
+        promotionRepository.getActivePromotions(new ApiCallback<ApiResponse<List<Promotion>>>() {
+            @Override
+            public void onSuccess(ApiResponse<List<Promotion>> response) {
+                android.util.Log.d("HomeFragment", "Promotions API success");
+                if (response != null && response.getData() != null && !response.getData().isEmpty()) {
+                    activePromotions = response.getData();
+                    android.util.Log.d("HomeFragment", "Found " + activePromotions.size() + " active promotions");
+                    displayPromotionBanner(activePromotions.get(0)); // Show first active promotion
+                } else {
+                    android.util.Log.d("HomeFragment", "No active promotions found");
+                }
+            }
+            
+            @Override
+            public void onError(String errorMessage) {
+                android.util.Log.e("HomeFragment", "Failed to load promotions: " + errorMessage);
+                // Silently fail - promotion banner is optional
+            }
+        });
+    }
+    
+    private void displayPromotionBanner(Promotion promotion) {
+        android.util.Log.d("HomeFragment", "Displaying promotion banner: " + promotion.getName());
+        if (promotionBannerView != null && promotion != null) {
+            promotionBannerView.setVisibility(View.VISIBLE);
+            android.util.Log.d("HomeFragment", "Banner view set to VISIBLE");
+            
+            if (tvPromotionName != null) {
+                tvPromotionName.setText(promotion.getName());
+            }
+            
+            if (tvPromotionDescription != null) {
+                tvPromotionDescription.setText(promotion.getDescription());
+            }
+            
+            if (tvPromotionDiscount != null) {
+                tvPromotionDiscount.setText(promotion.getDiscountBadgeText());
+            }
+        } else {
+            android.util.Log.e("HomeFragment", "Banner view is null or promotion is null");
+        }
     }
     
     private void setupBanner() {
@@ -190,21 +269,6 @@ public class HomeFragment extends Fragment {
     }
     
     private void setupListeners() {
-        // Banner navigation buttons
-        btnPrevBanner.setOnClickListener(v -> {
-            int currentItem = vpBanner.getCurrentItem();
-            if (currentItem > 0) {
-                vpBanner.setCurrentItem(currentItem - 1, true);
-            }
-        });
-        
-        btnNextBanner.setOnClickListener(v -> {
-            int currentItem = vpBanner.getCurrentItem();
-            int itemCount = promotionAdapter.getItemCount();
-            if (currentItem < itemCount - 1) {
-                vpBanner.setCurrentItem(currentItem + 1, true);
-            }
-        });
         
         // Notification button
         btnNotification.setOnClickListener(v -> {

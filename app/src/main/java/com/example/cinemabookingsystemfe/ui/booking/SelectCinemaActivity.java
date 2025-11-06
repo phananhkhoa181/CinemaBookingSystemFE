@@ -9,6 +9,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ProgressBar;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,8 +21,6 @@ import com.example.cinemabookingsystemfe.data.models.response.*;
 import com.example.cinemabookingsystemfe.data.repository.MovieRepository;
 import com.example.cinemabookingsystemfe.data.api.ApiCallback;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,7 +42,7 @@ public class SelectCinemaActivity extends AppCompatActivity {
     private MaterialToolbar toolbar;
     private Spinner spinnerCity;
     private Spinner spinnerCinema;
-    private ChipGroup chipGroupDates;
+    private LinearLayout chipGroupDates;
     private TextView tvSelectedDate;
     private RecyclerView rvCinemas;
     private ProgressBar progressBar;

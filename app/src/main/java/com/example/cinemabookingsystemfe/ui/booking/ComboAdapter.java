@@ -59,6 +59,15 @@ public class ComboAdapter extends RecyclerView.Adapter<ComboAdapter.ComboViewHol
         return null;
     }
 
+    public Combo getComboByName(String comboName) {
+        for (Combo combo : combos) {
+            if (combo.getName() != null && combo.getName().equals(comboName)) {
+                return combo;
+            }
+        }
+        return null;
+    }
+
     public List<Combo> getAllCombos() {
         return new ArrayList<>(combos);
     }

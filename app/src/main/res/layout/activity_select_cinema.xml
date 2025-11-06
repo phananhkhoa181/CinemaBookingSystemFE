@@ -107,14 +107,12 @@
                 android:scrollbars="none"
                 android:paddingVertical="@dimen/spacing_sm">
 
-                <com.google.android.material.chip.ChipGroup
+                <LinearLayout
                     android:id="@+id/chipGroupDates"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/spacing_md"
-                    app:singleSelection="true"
-                    app:selectionRequired="true"
-                    app:chipSpacing="@dimen/spacing_sm" />
+                    android:orientation="horizontal" />
 
             </HorizontalScrollView>
 

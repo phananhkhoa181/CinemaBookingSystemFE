@@ -240,4 +240,51 @@ public class MovieRepository {
             }
         });
     }
+    
+    /**
+     * Create a new review for a movie
+     */
+    public void createReview(com.example.cinemabookingsystemfe.data.models.request.CreateReviewRequest request,
+                            ApiCallback<ApiResponse<Void>> callback) {
+        Call<ApiResponse<Void>> call = apiService.createReview(request);
+        
+        call.enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                android.util.Log.d("MovieRepository", "createReview response code: " + response.code());
+                
+                if (response.isSuccessful()) {
+                    android.util.Log.d("MovieRepository", "createReview successful");
+                    // Even if body is null, 200/201 means success
+                    if (response.body() != null) {
+                        callback.onSuccess(response.body());
+                    } else {
+                        // Create a simple success response
+                        ApiResponse<Void> successResponse = new ApiResponse<>(true, "Review created successfully", null);
+                        callback.onSuccess(successResponse);
+                    }
+                } else {
+                    String errorMsg = "Error code: " + response.code();
+                    if (response.errorBody() != null) {
+                        try {
+                            String errorBody = response.errorBody().string();
+                            errorMsg = "Error " + response.code() + ": " + errorBody;
+                            android.util.Log.e("MovieRepository", "createReview error body: " + errorBody);
+                        } catch (Exception e) {
+                            android.util.Log.e("MovieRepository", "createReview error reading body", e);
+                        }
+                    }
+                    android.util.Log.e("MovieRepository", "createReview error: " + errorMsg);
+                    callback.onError(errorMsg);
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                String errorMsg = "Network error: " + t.getMessage();
+                android.util.Log.e("MovieRepository", "createReview failure: " + errorMsg, t);
+                callback.onError(errorMsg);
+            }
+        });
+    }
 }

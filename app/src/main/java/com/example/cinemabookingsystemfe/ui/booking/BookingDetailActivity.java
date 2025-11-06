@@ -35,7 +35,7 @@ public class BookingDetailActivity extends AppCompatActivity {
     
     private ImageView ivMoviePoster, ivQRCode;
     private TextView tvMovieTitle, tvFormat, tvCinemaName, tvShowtime;
-    private TextView tvSeatsLabel, tvBookingCode, tvTotalPrice;
+    private TextView tvSeatsLabel, tvBookingCode, tvAuditorium, tvTotalPrice;
     private MaterialButton btnClose;
     
     private BookingRepository bookingRepository;
@@ -69,6 +69,7 @@ public class BookingDetailActivity extends AppCompatActivity {
         tvShowtime = findViewById(R.id.tvShowtime);
         tvSeatsLabel = findViewById(R.id.tvSeatsLabel);
         tvBookingCode = findViewById(R.id.tvBookingCode);
+        tvAuditorium = findViewById(R.id.tvAuditorium);
         tvTotalPrice = findViewById(R.id.tvTotalPrice);
         btnClose = findViewById(R.id.btnClose);
     }
@@ -92,9 +93,24 @@ public class BookingDetailActivity extends AppCompatActivity {
                           bookingData.getShowtime().getLanguageType();
             tvFormat.setText(format);
             
-            // Format showtime
-            String showtime = formatShowtime(bookingData.getShowtime().getStartTime());
+            // Format showtime with day of week
+            String showtime = formatShowtimeWithDayOfWeek(bookingData.getShowtime().getStartTime());
             tvShowtime.setText(showtime);
+            
+            // Display auditorium name from response (if available)
+            if (bookingData.getShowtime().getAuditoriumName() != null && 
+                !bookingData.getShowtime().getAuditoriumName().isEmpty()) {
+                tvAuditorium.setText(bookingData.getShowtime().getAuditoriumName());
+            } else {
+                // Fallback: extract row from first seat if auditoriumName not available
+                if (bookingData.getSeats() != null && !bookingData.getSeats().isEmpty()) {
+                    String firstSeat = bookingData.getSeats().get(0);
+                    if (firstSeat != null && firstSeat.contains(" ")) {
+                        String row = firstSeat.split(" ")[0];
+                        tvAuditorium.setText(row);
+                    }
+                }
+            }
         }
         
         // Cinema info
@@ -129,6 +145,27 @@ public class BookingDetailActivity extends AppCompatActivity {
             SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm - dd/MM/yyyy", Locale.getDefault());
             Date date = inputFormat.parse(isoDateTime);
             return "Suất " + outputFormat.format(date);
+        } catch (Exception e) {
+            return isoDateTime;
+        }
+    }
+    
+    private String formatShowtimeWithDayOfWeek(String isoDateTime) {
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+            Date date = inputFormat.parse(isoDateTime);
+            
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", new Locale("vi", "VN"));
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            
+            String time = timeFormat.format(date);
+            String dayOfWeek = dayFormat.format(date);
+            // Capitalize first letter
+            dayOfWeek = dayOfWeek.substring(0, 1).toUpperCase() + dayOfWeek.substring(1);
+            String dateStr = dateFormat.format(date);
+            
+            return "Suất " + time + " - " + dayOfWeek + " - " + dateStr;
         } catch (Exception e) {
             return isoDateTime;
         }

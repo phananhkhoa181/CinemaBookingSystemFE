@@ -162,6 +162,55 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <!-- Promotion Notification (small banner) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardPromotionNotice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="80dp"
+        android:layout_marginHorizontal="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="#1A1A1A"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_promotion"
+                app:tint="@color/primaryColor"/>
+
+            <TextView
+                android:id="@+id/tvPromotionNotice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:text="Đã áp dụng khuyến mãi tháng 11 - Giảm 20%"
+                android:textSize="12sp"
+                android:textColor="@color/textPrimary"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="🎉"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Bottom Summary -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -190,14 +239,31 @@
                 android:maxLines="1"
                 android:ellipsize="end" />
 
-            <TextView
-                android:id="@+id/tvTotalAmount"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tổng Cộng: 665,000đ"
-                android:textSize="12sp"
-                android:textColor="@color/textSecondary"
-                android:layout_marginTop="2dp" />
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tvOriginalPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:textSize="11sp"
+                    android:textColor="@color/textSecondary"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/tvTotalAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tổng Cộng: 665,000đ"
+                    android:textSize="12sp"
+                    android:textColor="@color/textSecondary"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 

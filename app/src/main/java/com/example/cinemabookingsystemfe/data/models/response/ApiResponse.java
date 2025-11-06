@@ -8,10 +8,10 @@ import com.google.gson.annotations.SerializedName;
  * @param <T> Data type
  */
 public class ApiResponse<T> {
-    @SerializedName("success")
+    @SerializedName(value = "success", alternate = {"isSuccess"})
     private boolean success;
     
-    @SerializedName("status")
+    @SerializedName(value = "status", alternate = {"statusCode"})
     private int status;
     
     private String message;

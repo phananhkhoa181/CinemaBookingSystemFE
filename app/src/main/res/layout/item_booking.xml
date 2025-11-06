@@ -86,7 +86,7 @@
                     android:textColor="@color/textSecondary"
                     android:textSize="13sp"/>
 
-                <!-- Seats -->
+                <!-- Seats (Hidden in list view) -->
                 <TextView
                     android:id="@+id/tvSeats"
                     android:layout_width="match_parent"
@@ -95,7 +95,8 @@
                     android:text="Ghế: A1, A2"
                     android:textColor="@color/textSecondary"
                     android:textSize="13sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 

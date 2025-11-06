@@ -103,6 +103,9 @@ public class BookingListResponse implements Serializable {
 
         @SerializedName("languagetype")
         private String languageType;
+        
+        @SerializedName("auditoriumname")
+        private String auditoriumName;
 
         public String getStartTime() {
             return startTime;
@@ -114,6 +117,14 @@ public class BookingListResponse implements Serializable {
 
         public String getLanguageType() {
             return languageType;
+        }
+        
+        public String getAuditoriumName() {
+            return auditoriumName;
+        }
+        
+        public void setAuditoriumName(String auditoriumName) {
+            this.auditoriumName = auditoriumName;
         }
     }
 

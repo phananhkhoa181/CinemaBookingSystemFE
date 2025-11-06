@@ -57,14 +57,12 @@ public class PromotionAdapter extends RecyclerView.Adapter<PromotionAdapter.Prom
         ImageView ivBanner;
         TextView tvPromotionName;
         TextView tvPromotionDescription;
-        TextView tvPromotionDiscount;
         
         PromotionViewHolder(View itemView) {
             super(itemView);
             ivBanner = itemView.findViewById(R.id.ivBanner);
             tvPromotionName = itemView.findViewById(R.id.tvPromotionName);
             tvPromotionDescription = itemView.findViewById(R.id.tvPromotionDescription);
-            tvPromotionDiscount = itemView.findViewById(R.id.tvPromotionDiscount);
             
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -78,7 +76,6 @@ public class PromotionAdapter extends RecyclerView.Adapter<PromotionAdapter.Prom
             // Set text content
             tvPromotionName.setText(promotion.getName());
             tvPromotionDescription.setText(promotion.getDescription());
-            tvPromotionDiscount.setText(promotion.getDiscountDisplay());
             
             // Load banner image
             if (promotion.getImageUrl() != null && !promotion.getImageUrl().isEmpty()) {

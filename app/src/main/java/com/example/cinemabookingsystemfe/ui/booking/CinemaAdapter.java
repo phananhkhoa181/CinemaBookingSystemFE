@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.LinearLayout;
+import android.view.Gravity;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -12,8 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.data.models.response.Cinema;
 import com.example.cinemabookingsystemfe.data.models.response.Showtime;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
 
@@ -84,15 +84,13 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
     static class CinemaViewHolder extends RecyclerView.ViewHolder {
         
         private TextView tvCinemaName;
-        private TextView tvCinemaFormat;
-        private ChipGroup chipGroupShowtimes;
+        private LinearLayout layoutShowtimesContainer;
         private ImageView ivExpandCollapse;
         
         public CinemaViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCinemaName = itemView.findViewById(R.id.tvCinemaName);
-            tvCinemaFormat = itemView.findViewById(R.id.tvCinemaFormat);
-            chipGroupShowtimes = itemView.findViewById(R.id.chipGroupShowtimes);
+            layoutShowtimesContainer = itemView.findViewById(R.id.layoutShowtimesContainer);
             ivExpandCollapse = itemView.findViewById(R.id.ivExpandCollapse);
         }
         
@@ -124,77 +122,133 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
             
             if (isExpanded) {
                 // Expanded state - show all formats and showtimes
-                chipGroupShowtimes.setVisibility(View.VISIBLE);
-                tvCinemaFormat.setVisibility(View.GONE);
+                layoutShowtimesContainer.setVisibility(View.VISIBLE);
                 
-                // Clear previous chips
-                chipGroupShowtimes.removeAllViews();
+                // Clear previous views
+                layoutShowtimesContainer.removeAllViews();
                 
-                // Set ChipGroup to wrap content and break lines
-                chipGroupShowtimes.removeAllViews();
-                
-                // Add format labels and showtime chips with line breaks
+                // Add format groups with showtimes
                 for (java.util.Map.Entry<String, java.util.List<Showtime>> entry : groupedByFormat.entrySet()) {
-                    // Add format label as a disabled chip - full width để xuống dòng
-                    Chip formatChip = new Chip(itemView.getContext());
-                    formatChip.setText(entry.getKey());
-                    formatChip.setTextSize(12);
-                    formatChip.setChipBackgroundColorResource(R.color.cardBackground);
-                    formatChip.setTextColor(itemView.getContext().getColor(R.color.textSecondary));
-                    formatChip.setClickable(false);
-                    formatChip.setCheckable(false);
-                    formatChip.setChipStrokeWidth(0);
-                    
-                    // Set layout params to force new line - margin nhỏ
-                    ViewGroup.MarginLayoutParams formatParams = new ViewGroup.MarginLayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    // Create format group container
+                    LinearLayout formatGroup = new LinearLayout(itemView.getContext());
+                    formatGroup.setOrientation(LinearLayout.VERTICAL);
+                    LinearLayout.LayoutParams groupParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
                     );
-                    formatParams.topMargin = (int) (4 * itemView.getContext().getResources().getDisplayMetrics().density);
-                    formatParams.bottomMargin = 0; // KHÔNG có margin bottom
-                    formatChip.setLayoutParams(formatParams);
+                    groupParams.setMargins(0, 0, 0, dpToPx(16));
+                    formatGroup.setLayoutParams(groupParams);
                     
-                    chipGroupShowtimes.addView(formatChip);
+                    // Add format title
+                    TextView formatTitle = new TextView(itemView.getContext());
+                    formatTitle.setText(entry.getKey());
+                    formatTitle.setTextSize(13);
+                    formatTitle.setTextColor(itemView.getContext().getColor(R.color.textSecondary));
+                    LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    formatTitle.setLayoutParams(titleParams);
+                    formatGroup.addView(formatTitle);
                     
-                    // Add showtime chips for this format - trên cùng 1 dòng
-                    for (Showtime showtime : entry.getValue()) {
-                        Chip chip = new Chip(itemView.getContext());
-                        chip.setText(showtime.getTime());
-                        chip.setCheckable(false);
-                        chip.setClickable(true);
-                        chip.setChipBackgroundColorResource(android.R.color.white);
-                        chip.setTextColor(itemView.getContext().getColor(android.R.color.black));
-                        chip.setChipStrokeWidth(1);
-                        chip.setChipStrokeColorResource(R.color.border);
+                    // Create grid container for showtimes
+                    LinearLayout gridContainer = new LinearLayout(itemView.getContext());
+                    gridContainer.setOrientation(LinearLayout.VERTICAL);
+                    LinearLayout.LayoutParams gridParams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    gridParams.setMargins(0, dpToPx(8), 0, 0);
+                    gridContainer.setLayoutParams(gridParams);
+                    
+                    // Create rows of showtime boxes (3 per row)
+                    LinearLayout currentRow = null;
+                    int itemsInRow = 0;
+                    final int ITEMS_PER_ROW = 3;
+                    
+                    for (int i = 0; i < entry.getValue().size(); i++) {
+                        Showtime showtime = entry.getValue().get(i);
                         
-                        chip.setOnClickListener(v -> {
+                        // Create new row if needed
+                        if (itemsInRow == 0) {
+                            currentRow = new LinearLayout(itemView.getContext());
+                            currentRow.setOrientation(LinearLayout.HORIZONTAL);
+                            LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            );
+                            currentRow.setLayoutParams(rowParams);
+                            gridContainer.addView(currentRow);
+                        }
+                        
+                        // Create showtime box
+                        TextView showtimeBox = new TextView(itemView.getContext());
+                        showtimeBox.setText(showtime.getTime());
+                        showtimeBox.setTextSize(14);
+                        showtimeBox.setTextColor(itemView.getContext().getColor(R.color.textPrimary));
+                        showtimeBox.setGravity(Gravity.CENTER);
+                        showtimeBox.setBackgroundResource(R.drawable.bg_showtime_box_selector);
+                        showtimeBox.setClickable(true);
+                        showtimeBox.setFocusable(true);
+                        
+                        // Set padding
+                        int paddingH = dpToPx(20);
+                        int paddingV = dpToPx(10);
+                        showtimeBox.setPadding(paddingH, paddingV, paddingH, paddingV);
+                        
+                        // Set layout params
+                        LinearLayout.LayoutParams boxParams = new LinearLayout.LayoutParams(
+                            0,
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            1.0f
+                        );
+                        boxParams.setMargins(0, 0, dpToPx(8), dpToPx(8));
+                        showtimeBox.setLayoutParams(boxParams);
+                        
+                        showtimeBox.setOnClickListener(v -> {
                             if (listener != null) {
                                 listener.onShowtimeClick(showtime, cinema);
                             }
                         });
                         
-                        chipGroupShowtimes.addView(chip);
+                        currentRow.addView(showtimeBox);
+                        itemsInRow++;
+                        
+                        if (itemsInRow == ITEMS_PER_ROW) {
+                            itemsInRow = 0;
+                        }
                     }
+                    
+                    // Add empty placeholders to fill last row
+                    if (itemsInRow > 0 && itemsInRow < ITEMS_PER_ROW && currentRow != null) {
+                        for (int i = itemsInRow; i < ITEMS_PER_ROW; i++) {
+                            View placeholder = new View(itemView.getContext());
+                            LinearLayout.LayoutParams placeholderParams = new LinearLayout.LayoutParams(
+                                0,
+                                LinearLayout.LayoutParams.WRAP_CONTENT,
+                                1.0f
+                            );
+                            placeholderParams.setMargins(0, 0, dpToPx(8), dpToPx(8));
+                            placeholder.setLayoutParams(placeholderParams);
+                            currentRow.addView(placeholder);
+                        }
+                    }
+                    
+                    formatGroup.addView(gridContainer);
+                    layoutShowtimesContainer.addView(formatGroup);
                 }
             } else {
-                // Collapsed state - show only format text
-                chipGroupShowtimes.setVisibility(View.GONE);
-                
-                if (!groupedByFormat.isEmpty()) {
-                    // Show all formats separated by comma
-                    StringBuilder formats = new StringBuilder();
-                    int count = 0;
-                    for (String format : groupedByFormat.keySet()) {
-                        if (count > 0) formats.append(", ");
-                        formats.append(format);
-                        count++;
-                    }
-                    tvCinemaFormat.setText(formats.toString());
-                    tvCinemaFormat.setVisibility(View.VISIBLE);
-                } else {
-                    tvCinemaFormat.setVisibility(View.GONE);
-                }
+                // Collapsed state
+                layoutShowtimesContainer.setVisibility(View.GONE);
             }
+        }
+        
+        /**
+         * Convert dp to pixels
+         */
+        private int dpToPx(int dp) {
+            float density = itemView.getContext().getResources().getDisplayMetrics().density;
+            return Math.round(dp * density);
         }
     }
 }

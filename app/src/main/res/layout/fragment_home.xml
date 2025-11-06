@@ -98,28 +98,8 @@
                         android:layout_height="match_parent"/>
 
                     <!-- Previous Button -->
-                    <ImageButton
-                        android:id="@+id/btnPrevBanner"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center_vertical|start"
-                        android:layout_margin="8dp"
-                        android:background="@drawable/bg_banner_nav_button"
-                        android:src="@drawable/ic_arrow_back"
-                        android:contentDescription="Previous"
-                        app:tint="@color/white"/>
 
                     <!-- Next Button -->
-                    <ImageButton
-                        android:id="@+id/btnNextBanner"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center_vertical|end"
-                        android:layout_margin="8dp"
-                        android:background="@drawable/bg_banner_nav_button"
-                        android:src="@drawable/ic_arrow_forward"
-                        android:contentDescription="Next"
-                        app:tint="@color/white"/>
 
                     <!-- Indicator Dots -->
                     <com.google.android.material.tabs.TabLayout
@@ -178,6 +158,14 @@
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:paddingBottom="16dp"/>
+
+            <!-- Promotion Banner -->
+            <include
+                android:id="@+id/promotionBanner"
+                layout="@layout/item_promotion_banner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

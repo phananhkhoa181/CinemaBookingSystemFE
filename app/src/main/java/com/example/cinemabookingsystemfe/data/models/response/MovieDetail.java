@@ -1,12 +1,13 @@
 package com.example.cinemabookingsystemfe.data.models.response;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 
 /**
  * MovieDetail - Chi tiết phim từ API
  * Endpoint: GET /api/movies/{id}
  */
-public class MovieDetail {
+public class MovieDetail implements Serializable {
     
     @SerializedName("movieid")
     private int movieId;
@@ -40,6 +41,9 @@ public class MovieDetail {
     
     @SerializedName("genre")
     private String genre; // "Action, Sci-Fi, Adventure"
+    
+    @SerializedName("status")
+    private String status; // "NowShowing", "ComingSoon"
     
     @SerializedName("averageRating")
     private Double averageRating; // Review rating (1-5 stars)
@@ -140,6 +144,14 @@ public class MovieDetail {
     
     public void setGenre(String genre) {
         this.genre = genre;
+    }
+    
+    public String getStatus() {
+        return status;
+    }
+    
+    public void setStatus(String status) {
+        this.status = status;
     }
     
     public Double getAverageRating() {

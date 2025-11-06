@@ -28,16 +28,6 @@
                 tools:src="@drawable/ic_launcher_background"
                 android:contentDescription="Movie Poster"/>
 
-            <!-- Placeholder Icon -->
-            <ImageView
-                android:id="@+id/ivPlaceholder"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_movie_placeholder"
-                android:alpha="0.3"
-                app:tint="@color/textSecondary"/>
-
             <!-- Age Rating Badge - Bottom Right -->
             <TextView
                 android:id="@+id/tvAgeRating"

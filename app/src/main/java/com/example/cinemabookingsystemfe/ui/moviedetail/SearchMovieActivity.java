@@ -41,7 +41,6 @@ public class SearchMovieActivity extends AppCompatActivity {
     private ImageView btnBack;
     private Chip chipGenre;
     private Chip chipSort;
-    private Chip chipYear;
     private Chip chipRating;
     
     private View resultsContainer;
@@ -57,7 +56,6 @@ public class SearchMovieActivity extends AppCompatActivity {
     private List<Movie> displayList = new ArrayList<>();
     private String selectedGenre = ""; // lưu thể loại đã chọn
     private String selectedSort = ""; // e.g. "releasedate_desc"
-    private String selectedYear = "";
     private String selectedRating = "";
 
     @Override
@@ -89,7 +87,6 @@ public class SearchMovieActivity extends AppCompatActivity {
         btnSearch = findViewById(R.id.btnSearch);
         chipGenre = findViewById(R.id.chipGenre);
         chipSort = findViewById(R.id.chipSort);
-        chipYear = findViewById(R.id.chipYear);
         chipRating = findViewById(R.id.chipRating);
         
         resultsContainer = findViewById(R.id.resultsContainer);
@@ -189,7 +186,6 @@ public class SearchMovieActivity extends AppCompatActivity {
         // Filter chips
         chipGenre.setOnClickListener(v -> showGenreDialog());
         chipSort.setOnClickListener(v -> showSortDialog());
-        chipYear.setOnClickListener(v -> showYearDialog());
         chipRating.setOnClickListener(v -> showRatingDialog());
         
         // Enter key on keyboard triggers search
@@ -369,35 +365,13 @@ public class SearchMovieActivity extends AppCompatActivity {
                 .show();
     }
     
-    private void showYearDialog() {
-        String[] years = {"Tất cả", "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016", "2015"};
-
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Chọn năm phát hành")
-                .setItems(years, (dialog, which) -> {
-                    if (which == 0) {
-                        selectedYear = "";
-                        chipYear.setText("Năm");
-                    } else {
-                        selectedYear = years[which];
-                        chipYear.setText(selectedYear);
-                    }
-                    chipYear.setChecked(!selectedYear.isEmpty());
-                    // TODO: Apply year filter when API supports it
-                    Toast.makeText(this, "Lọc theo năm: " + (selectedYear.isEmpty() ? "Tất cả" : selectedYear), Toast.LENGTH_SHORT).show();
-                })
-                .show();
-    }
-    
     private void showRatingDialog() {
-        String[] ratings = {"Tất cả", "G", "PG", "PG-13", "R", "NC-17"};
+        String[] ratings = {"Tất cả", "G", "PG-13", "R"};
         String[] ratingDescriptions = {
                 "Tất cả độ tuổi",
                 "G - Mọi lứa tuổi",
-                "PG - Dưới 13 tuổi cần cha mẹ hướng dẫn",
                 "PG-13 - Không phù hợp cho trẻ dưới 13 tuổi",
-                "R - Dưới 17 tuổi cần cha mẹ đi cùng",
-                "NC-17 - Người lớn (17+)"
+                "R - Dưới 17 tuổi cần cha mẹ đi cùng"
         };
 
         new androidx.appcompat.app.AlertDialog.Builder(this)

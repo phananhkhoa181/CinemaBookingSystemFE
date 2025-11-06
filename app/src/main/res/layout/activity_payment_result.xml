@@ -271,6 +271,46 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Info Notice -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="#FFF0F0">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="start">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="top"
+                    android:layout_marginTop="2dp"
+                    android:src="@drawable/ic_info"
+                    android:tint="@color/primaryColor"
+                    android:contentDescription="Info" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:text="Mã đặt vé và mã QR đã được gửi về email của bạn. Bạn cũng có thể kiểm tra trong mục Lịch sử đặt vé."
+                    android:textSize="13sp"
+                    android:textColor="#424242"
+                    android:lineSpacingExtra="2dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Spacer -->
         <View
             android:layout_width="match_parent"

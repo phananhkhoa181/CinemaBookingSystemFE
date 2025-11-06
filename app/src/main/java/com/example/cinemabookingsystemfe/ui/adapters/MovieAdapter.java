@@ -54,13 +54,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
     }
     
     class MovieViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivPoster, ivPlaceholder;
+        ImageView ivPoster;
         TextView tvTitle, tvGenre, tvRating, tvDuration, tvAgeRating;
         
         MovieViewHolder(View itemView) {
             super(itemView);
             ivPoster = itemView.findViewById(R.id.ivPoster);
-            ivPlaceholder = itemView.findViewById(R.id.ivPlaceholder);
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvGenre = itemView.findViewById(R.id.tvGenre);
             tvRating = itemView.findViewById(R.id.tvRating);
@@ -92,32 +91,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
                 tvAgeRating.setVisibility(View.GONE);
             }
             
-            // Show placeholder by default
-            ivPlaceholder.setVisibility(View.VISIBLE);
-            
             Glide.with(ivPoster.getContext())
                 .load(movie.getPosterUrl())
                 .placeholder(R.drawable.bg_movie_placeholder)
                 .error(R.drawable.bg_movie_placeholder)
-                .listener(new com.bumptech.glide.request.RequestListener<android.graphics.drawable.Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(com.bumptech.glide.load.engine.GlideException e, Object model, 
-                        com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, 
-                        boolean isFirstResource) {
-                        ivPlaceholder.setVisibility(View.VISIBLE);
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(android.graphics.drawable.Drawable resource, 
-                        Object model, 
-                        com.bumptech.glide.request.target.Target<android.graphics.drawable.Drawable> target, 
-                        com.bumptech.glide.load.DataSource dataSource, 
-                        boolean isFirstResource) {
-                        ivPlaceholder.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
                 .into(ivPoster);
         }
     }
