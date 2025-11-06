@@ -17,6 +17,7 @@ import retrofit2.http.*;
  * - Register
  * - Logout
  * - Forgot Password
+ * - Profile Management (Get & Update)
  * 
  * Using MockApiService for now (no backend needed)
  * TODO: Implement other modules (Movies, Bookings, etc.) later
@@ -124,7 +125,7 @@ public interface ApiService {
     // ====================================
     
     // Get my bookings (requires authentication)
-    @GET("api/bookings/my-bookings")
+    @GET("api/Bookings/my-bookings")
     Call<ApiResponse<PaginatedBookingResponse>> getMyBookings(
             @Query("page") Integer page,
             @Query("pageSize") Integer pageSize,
@@ -132,29 +133,29 @@ public interface ApiService {
     );
     
     // Get booking detail by ID (requires authentication)
-    @GET("api/bookings/{id}")
+    @GET("api/Bookings/{id}")
     Call<ApiResponse<BookingDetail>> getBookingById(@Path("id") int bookingId);
     
     // Create booking (requires authentication)
-    @POST("api/bookings/create")
+    @POST("api/Bookings/create")
     Call<ApiResponse<CreateBookingResponse>> createBooking(@Body CreateBookingRequest request);
     
     // Add combos to booking (requires authentication)
-    @POST("api/bookings/{id}/add-combos")
+    @POST("api/Bookings/{id}/add-combos")
     Call<ApiResponse<AddCombosResponse>> addCombosToBooking(
         @Path("id") int bookingId,
         @Body AddCombosRequest request
     );
     
     // Apply voucher to booking (requires authentication)
-    @POST("api/bookings/{id}/apply-voucher")
+    @POST("api/Bookings/{id}/apply-voucher")
     Call<ApiResponse<ApplyVoucherResponse>> applyVoucher(
         @Path("id") int bookingId,
         @Body ApplyVoucherRequest request
     );
     
     // Cancel booking (requires authentication)
-    @POST("api/bookings/{id}/cancel")
+    @POST("api/Bookings/{id}/cancel")
     Call<ApiResponse<Void>> cancelBooking(@Path("id") int bookingId);
     
     // ====================================
@@ -193,6 +194,18 @@ public interface ApiService {
     // ====================================
     
     // Get customer profile (requires authentication)
-    @GET("api/customers/profile")
+    @GET("api/Customers/profile")
     Call<ApiResponse<CustomerProfile>> getCustomerProfile();
+    
+    // Update customer profile (requires authentication)
+    @PUT("api/Customers/profile")
+    Call<ApiResponse<CustomerProfile>> updateCustomerProfile(@Body UpdateCustomerRequest request);
+    
+    // ====================================
+    // USERS APIs
+    // ====================================
+    
+    // Update user information (requires authentication)
+    @PUT("api/Users/{id}")
+    Call<ApiResponse<UpdateUserResponse>> updateUser(@Path("id") int userId, @Body UpdateUserRequest request);
 }

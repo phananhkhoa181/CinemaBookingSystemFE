@@ -75,4 +75,5 @@
     <color name="text_secondary">@color/textSecondary</color>
     <color name="text_hint">@color/textHint</color>
     <color name="primary">@color/colorPrimary</color>
+    <color name="primaryLight">@color/colorPrimaryLight</color>
 </resources>

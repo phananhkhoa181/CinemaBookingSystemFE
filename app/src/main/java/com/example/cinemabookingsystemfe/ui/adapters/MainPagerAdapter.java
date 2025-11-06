@@ -7,7 +7,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.cinemabookingsystemfe.ui.main.HomeFragment;
 import com.example.cinemabookingsystemfe.ui.main.BookingHistoryFragment;
-import com.example.cinemabookingsystemfe.ui.main.ProfileFragment;
+import com.example.cinemabookingsystemfe.ui.profile.ProfileFragment;
 
 public class MainPagerAdapter extends FragmentStateAdapter {
     

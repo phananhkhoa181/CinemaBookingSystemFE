@@ -4,18 +4,19 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * ApiResponse - Generic wrapper cho tất cả API responses
- * Backend uses "status" field, not "success"
+ * Backend uses "isSuccess" and "statusCode" fields
  * @param <T> Data type
  */
 public class ApiResponse<T> {
-    @SerializedName("success")
+    @SerializedName("isSuccess")
     private boolean success;
     
-    @SerializedName("status")
+    @SerializedName("statusCode")
     private int status;
     
     private String message;
     private T data;
+    private Object errors; // Backend trả về errors array
     
     public ApiResponse() {}
     
@@ -26,9 +27,8 @@ public class ApiResponse<T> {
     }
     
     public boolean isSuccess() {
-        // Backend uses "status" field (200, 201, etc) instead of "success" boolean
-        // Consider 2xx status codes as success
-        return success || (status >= 200 && status < 300);
+        // Backend uses "isSuccess" boolean field
+        return success;
     }
     
     public void setSuccess(boolean success) {

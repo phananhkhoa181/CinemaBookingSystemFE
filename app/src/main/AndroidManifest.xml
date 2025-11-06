@@ -128,8 +128,13 @@
             android:exported="false"
             android:screenOrientation="portrait"/>
         
+        <!-- Profile Activities -->
+        <activity
+            android:name=".ui.profile.EditProfileActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CinemaBookingSystemFE" />
+        
         <!-- TODO: Thêm các Activities khác khi implement -->
-        <!-- ProfileEditActivity, etc. -->
         
     </application>
 
