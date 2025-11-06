@@ -52,8 +52,17 @@ public class ShowtimesByDate {
         @SerializedName("city")
         private String city;
         
+        @SerializedName("latitude")
+        private double latitude;
+        
+        @SerializedName("longitude")
+        private double longitude;
+        
         @SerializedName("showtimes")
         private List<ShowtimeItem> showtimes;
+        
+        // Client-side field for calculated distance (not from API)
+        private Double distance;
         
         // Getters and Setters
         public int getCinemaId() {
@@ -86,6 +95,30 @@ public class ShowtimesByDate {
         
         public void setCity(String city) {
             this.city = city;
+        }
+        
+        public double getLatitude() {
+            return latitude;
+        }
+        
+        public void setLatitude(double latitude) {
+            this.latitude = latitude;
+        }
+        
+        public double getLongitude() {
+            return longitude;
+        }
+        
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
+        }
+        
+        public Double getDistance() {
+            return distance;
+        }
+        
+        public void setDistance(Double distance) {
+            this.distance = distance;
         }
         
         public List<ShowtimeItem> getShowtimes() {

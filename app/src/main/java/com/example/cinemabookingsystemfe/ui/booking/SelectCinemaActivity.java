@@ -1,6 +1,7 @@
 package com.example.cinemabookingsystemfe.ui.booking;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import android.widget.ProgressBar;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,12 +22,14 @@ import com.example.cinemabookingsystemfe.adapters.SpinnerAdapter;
 import com.example.cinemabookingsystemfe.data.models.response.*;
 import com.example.cinemabookingsystemfe.data.repository.MovieRepository;
 import com.example.cinemabookingsystemfe.data.api.ApiCallback;
+import com.example.cinemabookingsystemfe.utils.LocationHelper;
 import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.HashMap;
@@ -60,6 +64,12 @@ public class SelectCinemaActivity extends AppCompatActivity {
     private MovieShowtimesResponse showtimesData;
     private List<ShowtimesByDate.ShowtimesByCinema> allCinemas = new ArrayList<>();
     private Map<String, List<ShowtimesByDate.ShowtimesByCinema>> showtimesByDateMap = new HashMap<>();
+    
+    // Location
+    private LocationHelper locationHelper;
+    private double userLatitude = 0;
+    private double userLongitude = 0;
+    private boolean hasUserLocation = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +93,17 @@ public class SelectCinemaActivity extends AppCompatActivity {
             // Initialize repository
             movieRepository = MovieRepository.getInstance(this);
             
+            // Initialize location helper
+            locationHelper = new LocationHelper(this);
+            
             initViews();
             android.util.Log.d("SelectCinema", "Views initialized");
             
             setupToolbar();
             android.util.Log.d("SelectCinema", "Toolbar setup complete");
+            
+            // Request location permission and get user location
+            requestUserLocation();
             
             setupSpinners();
             android.util.Log.d("SelectCinema", "Spinners setup complete");
@@ -271,6 +287,9 @@ public class SelectCinemaActivity extends AppCompatActivity {
             allCinemas.clear();
             allCinemas.addAll(cinemas);
             
+            // Calculate distances and sort if user location is available
+            calculateDistancesAndSort();
+            
             // Apply cinema filter if any cinema is selected
             int selectedCinemaIndex = spinnerCinema.getSelectedItemPosition();
             filterShowtimesByCinema(selectedCinemaIndex);
@@ -450,6 +469,130 @@ public class SelectCinemaActivity extends AppCompatActivity {
         }
         if (rvCinemas != null) {
             rvCinemas.setVisibility(View.VISIBLE);
+        }
+    }
+    
+    // ============================================
+    // LOCATION METHODS
+    // ============================================
+    
+    /**
+     * Request user location permission and get current location
+     */
+    private void requestUserLocation() {
+        if (locationHelper.hasLocationPermission()) {
+            // Permission already granted, get location
+            getUserLocation();
+        } else {
+            // Request permission
+            locationHelper.requestLocationPermission(this);
+        }
+    }
+    
+    /**
+     * Get user's current location
+     */
+    private void getUserLocation() {
+        android.util.Log.d("SelectCinema", "Getting user location...");
+        
+        locationHelper.getCurrentLocation(new LocationHelper.LocationListener() {
+            @Override
+            public void onLocationReceived(double latitude, double longitude) {
+                userLatitude = latitude;
+                userLongitude = longitude;
+                hasUserLocation = true;
+                
+                android.util.Log.d("SelectCinema", "User location: " + latitude + ", " + longitude);
+                
+                // Calculate distance for all cinemas if data is already loaded
+                if (allCinemas != null && !allCinemas.isEmpty()) {
+                    calculateDistancesAndSort();
+                }
+            }
+            
+            @Override
+            public void onLocationError(String error) {
+                android.util.Log.e("SelectCinema", "Location error: " + error);
+                hasUserLocation = false;
+                // Continue without location - cinemas will be shown without distance
+            }
+        });
+    }
+    
+    /**
+     * Calculate distance from user location to all cinemas and sort by distance
+     */
+    private void calculateDistancesAndSort() {
+        if (!hasUserLocation || allCinemas == null || allCinemas.isEmpty()) {
+            return;
+        }
+        
+        android.util.Log.d("SelectCinema", "Calculating distances for " + allCinemas.size() + " cinemas");
+        
+        // Calculate distance for each cinema
+        for (ShowtimesByDate.ShowtimesByCinema cinema : allCinemas) {
+            double cinemaLat = cinema.getLatitude();
+            double cinemaLon = cinema.getLongitude();
+            
+            // Only calculate if cinema has valid coordinates from API
+            if (cinemaLat != 0 && cinemaLon != 0) {
+                double distance = LocationHelper.calculateDistance(
+                        userLatitude, userLongitude,
+                        cinemaLat, cinemaLon
+                );
+                cinema.setDistance(distance);
+                android.util.Log.d("SelectCinema", cinema.getName() + " distance: " + distance + " km");
+            } else {
+                android.util.Log.w("SelectCinema", cinema.getName() + " - missing coordinates from API");
+            }
+        }
+        
+        // Sort cinemas by distance (closest first)
+        allCinemas.sort(new Comparator<ShowtimesByDate.ShowtimesByCinema>() {
+            @Override
+            public int compare(ShowtimesByDate.ShowtimesByCinema c1, ShowtimesByDate.ShowtimesByCinema c2) {
+                Double d1 = c1.getDistance();
+                Double d2 = c2.getDistance();
+                
+                // Cinemas without distance go to end
+                if (d1 == null && d2 == null) return 0;
+                if (d1 == null) return 1;
+                if (d2 == null) return -1;
+                
+                return Double.compare(d1, d2);
+            }
+        });
+        
+        // Update adapter with sorted cinemas
+        if (adapter != null) {
+            adapter.updateData(allCinemas);
+            adapter.notifyDataSetChanged();
+        }
+    }
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        
+        if (requestCode == LocationHelper.LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, get location
+                android.util.Log.d("SelectCinema", "Location permission granted");
+                getUserLocation();
+            } else {
+                // Permission denied, continue without location
+                android.util.Log.d("SelectCinema", "Location permission denied");
+                hasUserLocation = false;
+                Toast.makeText(this, "Không thể xác định vị trí của bạn", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (locationHelper != null) {
+            locationHelper.stopLocationUpdates();
         }
     }
 }

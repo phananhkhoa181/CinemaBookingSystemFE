@@ -75,6 +75,9 @@ dependencies {
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     
+    // Google Play Services Location
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+    
     // Chrome Custom Tabs (for VNPay payment)
     implementation("androidx.browser:browser:1.8.0")
     

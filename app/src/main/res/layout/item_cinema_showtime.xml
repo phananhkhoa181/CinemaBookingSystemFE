@@ -46,6 +46,21 @@
                 android:ellipsize="end"
                 android:maxLines="1" />
 
+            <!-- Distance from User -->
+            <TextView
+                android:id="@+id/tvCinemaDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:text="2.5 km"
+                android:textSize="12sp"
+                android:textColor="@color/textSecondary"
+                android:background="@drawable/bg_format_badge"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
             <!-- Expand/Collapse Icon -->
             <ImageView
                 android:id="@+id/ivExpandCollapse"

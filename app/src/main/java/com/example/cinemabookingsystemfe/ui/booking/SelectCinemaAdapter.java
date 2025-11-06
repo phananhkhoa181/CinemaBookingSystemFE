@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cinemabookingsystemfe.R;
 import com.example.cinemabookingsystemfe.data.models.response.ShowtimesByDate;
+import com.example.cinemabookingsystemfe.utils.LocationHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -87,12 +88,14 @@ public class SelectCinemaAdapter extends RecyclerView.Adapter<SelectCinemaAdapte
     static class CinemaViewHolder extends RecyclerView.ViewHolder {
         
         private TextView tvCinemaName;
+        private TextView tvCinemaDistance;
         private LinearLayout layoutShowtimesContainer;
         private ImageView ivExpandCollapse;
         
         public CinemaViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCinemaName = itemView.findViewById(R.id.tvCinemaName);
+            tvCinemaDistance = itemView.findViewById(R.id.tvCinemaDistance);
             layoutShowtimesContainer = itemView.findViewById(R.id.layoutShowtimesContainer);
             ivExpandCollapse = itemView.findViewById(R.id.ivExpandCollapse);
         }
@@ -104,7 +107,16 @@ public class SelectCinemaAdapter extends RecyclerView.Adapter<SelectCinemaAdapte
                         OnExpandClickListener expandListener) {
             tvCinemaName.setText(cinema.getName());
             
-            // Distance removed - API không cung cấp dữ liệu khoảng cách
+            // Display distance if available
+            if (tvCinemaDistance != null) {
+                Double distance = cinema.getDistance();
+                if (distance != null && distance > 0) {
+                    tvCinemaDistance.setText(LocationHelper.formatDistance(distance));
+                    tvCinemaDistance.setVisibility(View.VISIBLE);
+                } else {
+                    tvCinemaDistance.setVisibility(View.GONE);
+                }
+            }
             
             // Click listener for expansion
             itemView.setOnClickListener(v -> {
