@@ -30,6 +30,9 @@ public interface ApiService {
     @POST("api/auth/login")
     Call<LoginResponse> login(@Body LoginRequest request);  // Backend returns LoginResponse directly (not wrapped)
     
+    @POST("api/auth/google-login")
+    Call<ApiResponse<LoginResponse>> googleLogin(@Body GoogleLoginRequest request);
+    
     @POST("api/auth/register")
     Call<ApiResponse<RegisterResponse>> register(@Body RegisterRequest request);
     

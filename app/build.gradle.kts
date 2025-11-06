@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")  // Google Services plugin
 }
 
 android {
@@ -70,6 +71,9 @@ dependencies {
     // Glide (Image Loading)
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
     
     // Chrome Custom Tabs (for VNPay payment)
     implementation("androidx.browser:browser:1.8.0")

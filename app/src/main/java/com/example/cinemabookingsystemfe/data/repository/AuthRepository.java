@@ -6,6 +6,7 @@ import com.example.cinemabookingsystemfe.data.api.ApiCallback;
 import com.example.cinemabookingsystemfe.data.api.ApiClient;
 import com.example.cinemabookingsystemfe.data.api.ApiService;
 import com.example.cinemabookingsystemfe.data.models.request.ForgotPasswordRequest;
+import com.example.cinemabookingsystemfe.data.models.request.GoogleLoginRequest;
 import com.example.cinemabookingsystemfe.data.models.request.LoginRequest;
 import com.example.cinemabookingsystemfe.data.models.request.RefreshTokenRequest;
 import com.example.cinemabookingsystemfe.data.models.request.RegisterRequest;
@@ -127,6 +128,69 @@ public class AuthRepository {
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 android.util.Log.e("AuthRepository", "Login network failure", t);
+                callback.onError("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+    
+    /**
+     * Google Login - Send ID Token to backend
+     * API: POST /api/auth/google-login
+     * 
+     * @param idToken - Google ID Token from Google Sign-In
+     * @param callback - Callback for success/error
+     */
+    public void googleLogin(String idToken, ApiCallback<ApiResponse<LoginResponse>> callback) {
+        GoogleLoginRequest request = new GoogleLoginRequest(idToken);
+        Call<ApiResponse<LoginResponse>> call = apiService.googleLogin(request);
+        
+        call.enqueue(new Callback<ApiResponse<LoginResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<LoginResponse>> call, Response<ApiResponse<LoginResponse>> response) {
+                android.util.Log.d("AuthRepository", "Google Login response code: " + response.code());
+                
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<LoginResponse> apiResponse = response.body();
+                    
+                    android.util.Log.d("AuthRepository", "Google Login successful - HTTP " + response.code());
+                    
+                    if (apiResponse.isSuccess() && apiResponse.getData() != null) {
+                        LoginResponse loginResponse = apiResponse.getData();
+                        
+                        android.util.Log.d("AuthRepository", "Token: " + (loginResponse.getToken() != null ? "Present" : "NULL"));
+                        android.util.Log.d("AuthRepository", "User: " + (loginResponse.getUser() != null ? loginResponse.getUser().getEmail() : "NULL"));
+                        
+                        // Save token and user info
+                        prefsManager.saveToken(loginResponse.getToken());
+                        prefsManager.saveRefreshToken(loginResponse.getRefreshToken());
+                        prefsManager.saveUserId(loginResponse.getUserId());
+                        prefsManager.saveUserName(loginResponse.getFullname());
+                        prefsManager.saveUserEmail(loginResponse.getEmail());
+                        prefsManager.setLoggedIn(true);
+                        
+                        android.util.Log.d("AuthRepository", "Google Login successful, tokens saved for: " + loginResponse.getEmail());
+                        
+                        callback.onSuccess(apiResponse);
+                    } else {
+                        android.util.Log.e("AuthRepository", "Google Login response missing data");
+                        callback.onError("Đăng nhập Google thất bại: " + apiResponse.getMessage());
+                    }
+                } else {
+                    // Handle error responses
+                    android.util.Log.e("AuthRepository", "Google Login failed with HTTP code: " + response.code());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
+                        android.util.Log.e("AuthRepository", "Google Login error body: " + errorBody);
+                        callback.onError("Đăng nhập Google thất bại: " + errorBody);
+                    } catch (Exception e) {
+                        callback.onError("Đăng nhập Google thất bại: " + response.message());
+                    }
+                }
+            }
+            
+            @Override
+            public void onFailure(Call<ApiResponse<LoginResponse>> call, Throwable t) {
+                android.util.Log.e("AuthRepository", "Google Login network failure", t);
                 callback.onError("Lỗi kết nối: " + t.getMessage());
             }
         });
