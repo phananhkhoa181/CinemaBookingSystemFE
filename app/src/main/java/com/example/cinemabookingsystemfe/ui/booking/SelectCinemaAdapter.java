@@ -122,6 +122,11 @@ public class SelectCinemaAdapter extends RecyclerView.Adapter<SelectCinemaAdapte
             Map<String, List<ShowtimesByDate.ShowtimeItem>> groupedByFormat = new LinkedHashMap<>();
             if (cinema.getShowtimes() != null) {
                 for (ShowtimesByDate.ShowtimeItem showtime : cinema.getShowtimes()) {
+                    // Skip showtimes that have already passed
+                    if (isShowtimePassed(showtime.getStartTime())) {
+                        continue;
+                    }
+                    
                     String format = showtime.getFormat() + " " + showtime.getLanguageType();
                     if (!groupedByFormat.containsKey(format)) {
                         groupedByFormat.put(format, new ArrayList<>());
@@ -280,6 +285,26 @@ public class SelectCinemaAdapter extends RecyclerView.Adapter<SelectCinemaAdapte
                     return isoDateTime.substring(11, 16); // Extract HH:mm from "yyyy-MM-ddTHH:mm:ss"
                 }
                 return isoDateTime;
+            }
+        }
+        
+        /**
+         * Check if showtime has already passed
+         * @param isoDateTime Showtime in ISO 8601 format (e.g., "2025-11-06T14:30:00")
+         * @return true if showtime has passed, false otherwise
+         */
+        private boolean isShowtimePassed(String isoDateTime) {
+            try {
+                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+                Date showtimeDate = inputFormat.parse(isoDateTime);
+                Date now = new Date();
+                
+                // Return true if showtime is before current time
+                return showtimeDate != null && showtimeDate.before(now);
+            } catch (Exception e) {
+                android.util.Log.e("SelectCinemaAdapter", "Error checking showtime: " + e.getMessage());
+                // If error parsing, don't hide the showtime
+                return false;
             }
         }
     }
