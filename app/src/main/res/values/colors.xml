@@ -59,4 +59,8 @@
     <color name="overlay">#80000000</color>
     <color name="error">#F44336</color>
     <color name="success">#4CAF50</color>
+
+    <!-- Additional Profile Colors -->
+    <color name="statusErrorTransparent">#33F44336</color>
+
 </resources>
