@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class Cinema {
     
-    @SerializedName("cinema_id")
+    @SerializedName("cinemaid")
     private int cinemaId;
     
     @SerializedName("name")
@@ -23,6 +23,9 @@ public class Cinema {
     
     @SerializedName("city")
     private String city;
+    
+    @SerializedName("phone")
+    private String phone;
     
     @SerializedName("latitude")
     private double latitude;
@@ -86,6 +89,14 @@ public class Cinema {
     
     public void setCity(String city) {
         this.city = city;
+    }
+    
+    public String getPhone() {
+        return phone;
+    }
+    
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
     
     public double getLatitude() {

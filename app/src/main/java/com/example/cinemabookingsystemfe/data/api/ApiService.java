@@ -204,6 +204,14 @@ public interface ApiService {
     );
     
     // ====================================
+    // CINEMAS APIs
+    // ====================================
+    
+    // Get all cinemas
+    @GET("api/Cinemas")
+    Call<ApiResponse<List<Cinema>>> getCinemas();
+    
+    // ====================================
     // CUSTOMERS APIs
     // ====================================
     

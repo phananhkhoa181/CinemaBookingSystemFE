@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.cinemabookingsystemfe.ui.main.HomeFragment;
+import com.example.cinemabookingsystemfe.ui.main.CinemasFragment;
 import com.example.cinemabookingsystemfe.ui.main.BookingHistoryFragment;
 import com.example.cinemabookingsystemfe.ui.profile.ProfileFragment;
 
@@ -22,8 +23,10 @@ public class MainPagerAdapter extends FragmentStateAdapter {
             case 0:
                 return new HomeFragment();
             case 1:
-                return new BookingHistoryFragment();
+                return new CinemasFragment();
             case 2:
+                return new BookingHistoryFragment();
+            case 3:
                 return new ProfileFragment();
             default:
                 return new HomeFragment();
@@ -32,6 +35,6 @@ public class MainPagerAdapter extends FragmentStateAdapter {
     
     @Override
     public int getItemCount() {
-        return 3;
+        return 4; // Changed from 3 to 4
     }
 }

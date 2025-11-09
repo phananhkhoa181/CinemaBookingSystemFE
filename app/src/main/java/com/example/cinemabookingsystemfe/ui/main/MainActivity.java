@@ -66,9 +66,12 @@ public class MainActivity extends AppCompatActivity {
                         bottomNav.setSelectedItemId(R.id.nav_home);
                         break;
                     case 1:
-                        bottomNav.setSelectedItemId(R.id.nav_bookings);
+                        bottomNav.setSelectedItemId(R.id.nav_cinemas);
                         break;
                     case 2:
+                        bottomNav.setSelectedItemId(R.id.nav_bookings);
+                        break;
+                    case 3:
                         bottomNav.setSelectedItemId(R.id.nav_profile);
                         break;
                 }
@@ -81,17 +84,20 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == R.id.nav_home) {
                 viewPager.setCurrentItem(0, false);
                 return true;
+            } else if (itemId == R.id.nav_cinemas) {
+                viewPager.setCurrentItem(1, false);
+                return true;
             } else if (itemId == R.id.nav_bookings) {
                 // Check login before accessing Bookings
                 if (checkLoginRequired("Lịch sử")) {
-                    viewPager.setCurrentItem(1, false);
+                    viewPager.setCurrentItem(2, false);
                     return true;
                 }
                 return false;
             } else if (itemId == R.id.nav_profile) {
                 // Check login before accessing Profile
                 if (checkLoginRequired("Tài khoản")) {
-                    viewPager.setCurrentItem(2, false);
+                    viewPager.setCurrentItem(3, false);
                     return true;
                 }
                 return false;

@@ -7,6 +7,11 @@
         android:title="Trang chủ"/>
     
     <item
+        android:id="@+id/nav_cinemas"
+        android:icon="@drawable/ic_location"
+        android:title="Rạp"/>
+    
+    <item
         android:id="@+id/nav_bookings"
         android:icon="@drawable/ic_ticket"
         android:title="Lịch sử"/>
